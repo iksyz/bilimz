@@ -48,7 +48,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     "author": {
       "@type": "Person",
       "name": "Emre İpekyüz",
-      "jobTitle": "Kurucu & Bilim Yazarı",
+      "jobTitle": "Founder & Science Writer",
       "url": "https://scienceone.net"
     },
     "publisher": {
@@ -180,13 +180,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
               <div className="text-center md:text-left flex-1">
                 <h3 className="text-xl font-bold text-foreground mb-1">Emre İpekyüz</h3>
-                <p className="text-primary font-medium text-sm mb-3">Kurucu & Bilim Yazarı @ ScienceOne</p>
+                <p className="text-primary font-medium text-sm mb-3">Founder & Science Writer @ ScienceOne</p>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  Teknoloji, uzay bilimleri ve biyo-teknoloji alanlarındaki karmaşık gelişmeleri anlaşılır bir dille aktaran araştırmacı yazar. Geleceğin inovasyonlarını günümüz okurlarıyla buluşturarak bilimsel okuryazarlığı artırmayı hedefliyor.
+                  An investigative writer translating complex developments in technology, space sciences, and bio-technology into accessible language. He aims to increase scientific literacy by bringing the innovations of the future to today's readers.
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-3">
                   <Link href="https://scienceone.net" className="text-xs font-semibold text-foreground/70 hover:text-primary transition-colors bg-background/50 px-3 py-1.5 rounded-full border border-border">
-                    Yazarın Yazıları
+                    Read More
                   </Link>
                 </div>
               </div>
