@@ -48,6 +48,8 @@ const categories = [
 ]
 
 export function MainNav() {
+  const [open, setOpen] = React.useState(false)
+
   return (
     <div className="flex w-full items-center">
       <div className="mr-6 flex flex-col justify-center">
@@ -99,14 +101,12 @@ export function MainNav() {
 
       {/* Mobile Navigation */}
       <div className="flex flex-1 items-center justify-end md:hidden">
-        <Sheet>
-          <SheetTrigger 
-            render={
-              <Button variant="ghost" size="icon" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" />
-            }
-          >
-            <Menu className="h-6 w-6" />
-            <span className="sr-only">Toggle Menu</span>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Toggle Menu</span>
+            </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[85vw] max-w-md p-0 font-sans border-l border-primary/10 bg-background/98 backdrop-blur-xl">
             <SheetHeader className="px-6 py-6 text-left border-b border-border/40">
@@ -125,6 +125,7 @@ export function MainNav() {
                   <Link
                     key={category.href}
                     href={category.href}
+                    onClick={() => setOpen(false)}
                     className="flex items-center px-4 py-3.5 rounded-xl bg-muted/40 text-foreground/90 hover:bg-primary/10 hover:text-primary active:scale-[0.98] transition-all font-semibold"
                   >
                     {category.title}
@@ -133,10 +134,10 @@ export function MainNav() {
               </div>
               <div className="flex flex-col gap-2 pt-6 border-t border-border/40">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-foreground/50 mb-2 pl-2">Menu</h4>
-                <Link href="/discover" className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
+                <Link onClick={() => setOpen(false)} href="/discover" className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
                   Discover
                 </Link>
-                <Link href="/about" className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
+                <Link onClick={() => setOpen(false)} href="/about" className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
                   About Us
                 </Link>
               </div>
