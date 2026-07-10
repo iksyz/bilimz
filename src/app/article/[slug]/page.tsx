@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60;
+export const runtime = "edge";
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;

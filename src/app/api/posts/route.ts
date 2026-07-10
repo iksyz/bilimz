@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import slugify from "slugify";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export async function GET() {
   try {

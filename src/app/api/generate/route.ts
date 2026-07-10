@@ -4,6 +4,9 @@ import slugify from "slugify";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { CLAUDE_SYSTEM_PROMPT } from "@/lib/prompt-templates";
 
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || "dummy",
 });

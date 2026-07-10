@@ -14,6 +14,7 @@ const categoryTitles: Record<string, string> = {
 };
 
 export const revalidate = 60; // Revalidate every minute
+export const runtime = "edge";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
