@@ -39,8 +39,34 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     month: 'short', day: 'numeric', year: 'numeric'
   });
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "image": article.image_url,
+    "datePublished": article.created_at,
+    "author": {
+      "@type": "Person",
+      "name": "Emre İpekyüz",
+      "jobTitle": "Kurucu & Bilim Yazarı",
+      "url": "https://scienceone.net"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "ScienceOne",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://scienceone.net/icon"
+      }
+    }
+  };
+
   return (
     <article className="min-h-screen bg-background pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       
       {/* Cinematic Hero Section (Desktop) */}
       <div className="hidden md:block relative w-full h-[70vh] bg-muted overflow-hidden">
@@ -144,6 +170,27 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 .replace(/> \*\*(.*?)\*\*/g, '<blockquote><strong>$1</strong></blockquote>')
                 .replace(/\n\n/g, '<br/><br/>')
             }} />
+          </div>
+
+          {/* Author Bio (E-E-A-T) */}
+          <div className="mt-12 pt-8 border-t border-border animate-in fade-in duration-1000 delay-500 fill-mode-both">
+            <div className="bg-muted/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 border border-border/50 hover:border-primary/30 transition-colors">
+              <div className="h-24 w-24 rounded-full bg-primary/10 shrink-0 overflow-hidden border-2 border-primary/20 flex items-center justify-center text-primary text-3xl font-bold shadow-sm">
+                Eİ
+              </div>
+              <div className="text-center md:text-left flex-1">
+                <h3 className="text-xl font-bold text-foreground mb-1">Emre İpekyüz</h3>
+                <p className="text-primary font-medium text-sm mb-3">Kurucu & Bilim Yazarı @ ScienceOne</p>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                  Teknoloji, uzay bilimleri ve biyo-teknoloji alanlarındaki karmaşık gelişmeleri anlaşılır bir dille aktaran araştırmacı yazar. Geleceğin inovasyonlarını günümüz okurlarıyla buluşturarak bilimsel okuryazarlığı artırmayı hedefliyor.
+                </p>
+                <div className="flex items-center justify-center md:justify-start gap-3">
+                  <Link href="https://scienceone.net" className="text-xs font-semibold text-foreground/70 hover:text-primary transition-colors bg-background/50 px-3 py-1.5 rounded-full border border-border">
+                    Yazarın Yazıları
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
           
           {/* Mobile Action Bar (Moved to end) */}
