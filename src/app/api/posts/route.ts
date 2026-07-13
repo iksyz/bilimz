@@ -82,6 +82,7 @@ export async function POST(request: Request) {
       throw error;
     }
 
+    revalidatePath("/", "layout");
     revalidatePath("/sitemap.xml");
     
     // Notify Google Indexing API
@@ -164,6 +165,7 @@ export async function PATCH(request: Request) {
       throw updateError;
     }
 
+    revalidatePath("/", "layout");
     revalidatePath("/sitemap.xml");
 
     // Notify Google Indexing API
@@ -208,6 +210,7 @@ export async function DELETE(request: Request) {
       );
     }
 
+    revalidatePath("/", "layout");
     revalidatePath("/sitemap.xml");
 
     // Notify Google Indexing API
