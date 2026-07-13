@@ -31,7 +31,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, summary, content, category, image_url, image_prompt, customSlug } = body;
+    const { title, summary, content, category, image_url, image_prompt, customSlug, author } = body;
 
     if (!title || !summary || !content || !category || !image_url) {
       return NextResponse.json(
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
           content,
           image_url,
           image_prompt: image_prompt || null,
+          author: author || "Emre Ipekyuz",
         },
       ])
       .select()
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { slug, title, summary, content, category, image_url, image_prompt, customSlug } = body;
+    const { slug, title, summary, content, category, image_url, image_prompt, customSlug, author } = body;
 
     if (!slug) {
       return NextResponse.json(
@@ -153,6 +154,7 @@ export async function PATCH(request: Request) {
         category: category || currentPost.category,
         image_url: image_url || currentPost.image_url,
         image_prompt: image_prompt !== undefined ? image_prompt : currentPost.image_prompt,
+        author: author || currentPost.author,
       })
       .eq("slug", slug)
       .select()

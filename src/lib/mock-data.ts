@@ -5,6 +5,7 @@ export const fallbackPosts = [
     title: "Neural Interfaces: The Dawn of Brain-Computer Symbiosis",
     summary: "Explore how direct brain-to-machine connections are moving from science fiction into clinical reality, potentially redefining human consciousness.",
     category: "Bio-Tech",
+    author: "Wei Chen",
     content: `
 **What if you could control digital environments using nothing but your thoughts? This is no longer speculative fiction—it is the bleeding edge of neurotechnology.**
 
@@ -31,6 +32,7 @@ The integration of human consciousness with artificial intelligence raises unpre
     title: "Beyond the Pale Blue Dot: Atmospheric Insights from the James Webb",
     summary: "The latest atmospheric spectral data is providing unprecedented glimpses into exoplanets that might harbor the chemical building blocks of life.",
     category: "Cosmos",
+    author: "Siir Kaya",
     content: `
 **We are no longer just looking at stars; we are breathing the atmospheres of distant worlds.**
 
@@ -54,6 +56,7 @@ The ultimate prize in exoplanet research is finding biosignatures—gases like o
     title: "Shodan: Unveiling the UI of the Hidden Internet",
     summary: "Discover how Shodan's interface maps the hidden web, exposing vulnerable devices and critical infrastructure with terrifying simplicity.",
     category: "Deep-Dive",
+    author: "Lukas Weber",
     content: `
 **What if there was a search engine not for websites, but for exposed power plants, baby monitors, and unsecured databases? Welcome to Shodan.**
 

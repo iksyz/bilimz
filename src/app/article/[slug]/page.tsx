@@ -97,6 +97,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const formattedDate = new Date(article.created_at).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric'
   });
+  // Ensure author defaults to Emre if missing
+  const authorName = article.author || "Emre Ipekyuz";
+  
+  const AUTHOR_INFO: Record<string, { initials: string, title: string, bgClass: string, textClass: string }> = {
+    "Emre Ipekyuz": { initials: "EI", title: "Founder & Science Writer", bgClass: "bg-[#E5F7ED] dark:bg-emerald-900/40", textClass: "text-[#10B981] dark:text-emerald-400" },
+    "Siir Kaya": { initials: "SK", title: "Senior Cosmos Researcher", bgClass: "bg-blue-100 dark:bg-blue-900/40", textClass: "text-blue-600 dark:text-blue-400" },
+    "Wei Chen": { initials: "WC", title: "Bio-Tech Lead Analyst", bgClass: "bg-rose-100 dark:bg-rose-900/40", textClass: "text-rose-600 dark:text-rose-400" },
+    "Lukas Weber": { initials: "LW", title: "Deep-Space Correspondent", bgClass: "bg-amber-100 dark:bg-amber-900/40", textClass: "text-amber-600 dark:text-amber-400" },
+  };
+
+  const currentAuthor = AUTHOR_INFO[authorName] || AUTHOR_INFO["Emre Ipekyuz"];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -106,8 +117,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     "datePublished": article.created_at,
     "author": {
       "@type": "Person",
-      "name": "Emre İpekyüz",
-      "jobTitle": "Founder & Science Writer",
+      "name": authorName,
+      "jobTitle": currentAuthor.title,
       "url": "https://scienceone.net"
     },
     "publisher": {
@@ -162,12 +173,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               {article.title}
             </h1>
             <div className="flex items-center gap-3 pt-4">
-              <div className="h-12 w-12 rounded-full bg-[#E5F7ED] dark:bg-emerald-900/40 flex items-center justify-center text-[#10B981] dark:text-emerald-400 font-bold text-base shadow-sm">
-                Eİ
+              <div className={`h-12 w-12 rounded-full ${currentAuthor.bgClass} flex items-center justify-center ${currentAuthor.textClass} font-bold text-base shadow-sm`}>
+                {currentAuthor.initials}
               </div>
               <div className="flex flex-col">
-                <span className="text-base font-bold text-foreground">Emre İpekyüz</span>
-                <span className="text-sm text-foreground/80 font-medium">Founder & Science Writer</span>
+                <span className="text-base font-bold text-foreground">{authorName}</span>
+                <span className="text-sm text-foreground/80 font-medium">{currentAuthor.title}</span>
               </div>
             </div>
           </div>
@@ -196,12 +207,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {article.title}
           </h1>
           <div className="flex items-center gap-3 pt-2">
-            <div className="h-10 w-10 rounded-full bg-[#E5F7ED] dark:bg-emerald-900/40 flex items-center justify-center text-[#10B981] dark:text-emerald-400 font-bold text-sm shadow-sm">
-              Eİ
+            <div className={`h-10 w-10 rounded-full ${currentAuthor.bgClass} flex items-center justify-center ${currentAuthor.textClass} font-bold text-sm shadow-sm`}>
+              {currentAuthor.initials}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-foreground">Emre İpekyüz</span>
-              <span className="text-xs text-muted-foreground font-medium">Founder & Science Writer</span>
+              <span className="text-sm font-bold text-foreground">{authorName}</span>
+              <span className="text-xs text-muted-foreground font-medium">{currentAuthor.title}</span>
             </div>
           </div>
         </div>

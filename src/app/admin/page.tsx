@@ -28,6 +28,7 @@ type Post = {
   content: string;
   image_url: string;
   image_prompt?: string;
+  author: string;
   created_at: string;
 };
 
@@ -47,6 +48,7 @@ type FormState = {
   image_prompt: string;
   tags: string;
   customSlug: string;
+  author: string;
 };
 
 const INITIAL_FORM: FormState = {
@@ -58,6 +60,7 @@ const INITIAL_FORM: FormState = {
   image_prompt: "",
   tags: "",
   customSlug: "",
+  author: "Emre Ipekyuz",
 };
 
 export default function AdminPage() {
@@ -489,6 +492,7 @@ export default function AdminPage() {
       image_prompt: post.image_prompt || "",
       tags: "",
       customSlug: post.slug,
+      author: post.author || "Emre Ipekyuz",
     });
     setActiveDraftId(post.slug);
     setActiveTab("editor");
@@ -805,13 +809,21 @@ export default function AdminPage() {
                     />
                   </div>
 
-                  {/* Kategori & Slug */}
-                  <div className="grid gap-4 md:grid-cols-2">
+                  {/* Kategori, Yazar & Slug */}
+                  <div className="grid gap-4 md:grid-cols-3">
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold tracking-wider uppercase text-primary">Kategori</label>
                       <select
                         value={form.category}
-                        onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                        onChange={(e) => {
+                          const cat = e.target.value;
+                          let autoAuthor = form.author;
+                          if (cat === "Life-Science") autoAuthor = "Emre Ipekyuz";
+                          else if (cat === "Cosmos") autoAuthor = "Siir Kaya";
+                          else if (cat === "Bio-Tech") autoAuthor = "Wei Chen";
+                          else if (cat === "Deep-Dive") autoAuthor = "Lukas Weber";
+                          setForm((prev) => ({ ...prev, category: cat, author: autoAuthor }));
+                        }}
                         className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-primary/50"
                       >
                         {CATEGORIES.map((c) => (
@@ -823,14 +835,28 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-1.5">
+                      <label className="text-xs font-bold tracking-wider uppercase text-primary">Yazar (Kategoriye Özel)</label>
+                      <select
+                        value={form.author}
+                        disabled
+                        className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm text-muted-foreground focus:outline-none opacity-80 cursor-not-allowed"
+                      >
+                        <option value="Emre Ipekyuz" className="bg-[#011410]">Emre Ipekyuz</option>
+                        <option value="Siir Kaya" className="bg-[#011410]">Siir Kaya</option>
+                        <option value="Wei Chen" className="bg-[#011410]">Wei Chen</option>
+                        <option value="Lukas Weber" className="bg-[#011410]">Lukas Weber</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
                       <label className="text-xs font-bold tracking-wider uppercase text-primary flex items-center justify-between">
-                        Özel URL Linki (Slug) <span className="text-[10px] text-muted-foreground font-normal lowercase">(İsteğe Bağlı)</span>
+                        Özel URL Linki <span className="text-[10px] text-muted-foreground font-normal lowercase">(İsteğe Bağlı)</span>
                       </label>
                       <input
                         type="text"
                         value={form.customSlug}
                         onChange={(e) => setForm((prev) => ({ ...prev, customSlug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-") }))}
-                        placeholder="Örn: kuantum-bilgisayarlar-ve-simbiyoz"
+                        placeholder="Örn: kuantum-bilgisayarlar"
                         className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm font-mono text-[#a7f3d0] placeholder-muted-foreground focus:outline-none focus:border-primary/50"
                       />
                     </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { MainNav } from "@/components/main-nav";
+import { Footer } from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -72,12 +73,7 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* Muted Footer */}
-        <footer className="border-t bg-muted">
-          <div className="container mx-auto py-8 px-4 md:px-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} ScienceOne.net. All rights reserved.</p>
-          </div>
-        </footer>
+        <Footer />
 
       </body>
     </html>
