@@ -80,6 +80,7 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false);
   const [inlineUploading, setInlineUploading] = useState(false);
   const [formatting, setFormatting] = useState(false);
+  const [isLeoGenerating, setIsLeoGenerating] = useState(false);
   
   // Yapay Zeka Üretim Durumları
   const [generating, setGenerating] = useState(false);
@@ -165,9 +166,15 @@ export default function AdminPage() {
   function loadDraft(draft: Draft) {
     setForm(draft.form);
     setEditingSlug(null);
-    setActiveDraftId(draft.id);
+    
+    // Taslağı listeden temizle (sıfırla)
+    const nextDrafts = drafts.filter((d) => d.id !== draft.id);
+    localStorage.setItem(DRAFTS_KEY, JSON.stringify(nextDrafts));
+    setDrafts(nextDrafts);
+    
+    setActiveDraftId(null);
     setActiveTab("editor");
-    showMsg(`Taslak "${draft.label}" editöre yüklendi.`, "info");
+    showMsg(`Taslak "${draft.label}" editöre yüklendi ve taslak listesinden silindi.`, "info");
   }
 
   function deleteDraft(id: string) {
@@ -351,6 +358,43 @@ export default function AdminPage() {
       textarea.focus();
       textarea.setSelectionRange(start + md.length, start + md.length);
     }, 50);
+  }
+
+  // --- Leonardo AI ---
+  async function generateLeoImage(type: 'cover' | 'inline') {
+    if (!form.image_prompt.trim()) {
+      showMsg("Lütfen önce görsel üretim istemini (prompt) yazın.", "info");
+      return;
+    }
+
+    setIsLeoGenerating(true);
+    showMsg(`Leonardo AI görsel üretiyor (${type === 'cover' ? 'Kapak' : 'Yazı İçi'}). Lütfen bekleyin...`, "info");
+
+    try {
+      const res = await fetch("/api/admin/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: form.image_prompt }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok && data.url) {
+        if (type === 'cover') {
+          setForm((prev) => ({ ...prev, image_url: data.url }));
+          showMsg("Kapak görseli başarıyla üretildi ve eklendi.", "success");
+        } else {
+          insertImageAtCursor(data.url, form.image_prompt.slice(0, 30));
+          showMsg("Görsel üretildi ve yazı içine eklendi.", "success");
+        }
+      } else {
+        showMsg(data.message || "Görsel üretimi başarısız oldu.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("Leonardo AI görsel üretilirken hata oluştu.", "error");
+    } finally {
+      setIsLeoGenerating(false);
+    }
   }
 
   // --- Yapay Zeka Araçları ---
@@ -581,14 +625,14 @@ export default function AdminPage() {
       
       {/* Bildirim Çubuğu */}
       {message && (
-        <div className={`p-4 rounded-xl border flex items-center gap-3 animate-in fade-in duration-300 ${
+        <div className={`fixed bottom-6 right-6 z-50 p-3.5 pr-5 rounded-full border shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-5 fade-in duration-300 backdrop-blur-md max-w-md ${
           message.type === "success" 
-            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" 
+            ? "bg-[#012215]/90 border-emerald-500/50 text-emerald-400" 
             : message.type === "error" 
-            ? "bg-rose-500/10 border-rose-500/30 text-rose-400" 
-            : "bg-blue-500/10 border-blue-500/30 text-blue-400"
+            ? "bg-[#2A0810]/90 border-rose-500/50 text-rose-400" 
+            : "bg-[#07192A]/90 border-blue-500/50 text-blue-400"
         }`}>
-          {message.type === "success" ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+          {message.type === "success" ? <CheckCircle className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
           <p className="text-sm font-medium">{message.text}</p>
         </div>
       )}
@@ -960,7 +1004,29 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold tracking-wider uppercase text-primary">Görsel Üretim İstemi (Image Prompt) <span className="text-[10px] text-muted-foreground font-normal lowercase">(AI referansı için)</span></label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold tracking-wider uppercase text-primary">Görsel Üretim İstemi (Image Prompt) <span className="text-[10px] text-muted-foreground font-normal lowercase">(AI referansı için)</span></label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          disabled={isLeoGenerating || !form.image_prompt.trim()}
+                          onClick={() => generateLeoImage('cover')}
+                          className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-[10px] text-[#a7f3d0] font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
+                        >
+                          {isLeoGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-amber-400" />}
+                          Kapak İçin Üret
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isLeoGenerating || !form.image_prompt.trim()}
+                          onClick={() => generateLeoImage('inline')}
+                          className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-[10px] text-[#a7f3d0] font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
+                        >
+                          {isLeoGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-indigo-400" />}
+                          Yazı İçi Üret
+                        </button>
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={form.image_prompt}

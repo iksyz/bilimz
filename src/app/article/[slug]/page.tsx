@@ -253,8 +253,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           >
             <div dangerouslySetInnerHTML={{ 
               __html: article.content
+                .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl my-8 object-cover border border-primary/10" />')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+                .replace(/### (.*?)(?:\n|$)/g, '<h3>$1</h3>')
+                .replace(/## (.*?)(?:\n|$)/g, '<h2>$1</h2>')
                 .replace(/> \*\*(.*?)\*\*/g, '<blockquote><strong>$1</strong></blockquote>')
                 .replace(/\n\n/g, '<br/><br/>')
             }} />
