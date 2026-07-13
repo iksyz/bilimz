@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { notifyGoogleIndexing } from "@/lib/indexing";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 export async function GET() {
   try {

@@ -5,7 +5,6 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { CLAUDE_SYSTEM_PROMPT } from "@/lib/prompt-templates";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 // Mock Leonardo function for prototype.
 async function generateImage(prompt: string): Promise<string> {

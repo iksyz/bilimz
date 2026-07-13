@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 const LEO_API_URL = "https://cloud.leonardo.ai/api/rest/v1";
 

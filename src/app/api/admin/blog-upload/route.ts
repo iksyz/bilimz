@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 const BUCKET = "blog-images";
 const MAX_BYTES = 8 * 1024 * 1024;

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { createMessage } from "@/lib/anthropic";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 
 const SYSTEM_PROMPT = `You are an extremely strict formatting assistant. Your ONLY job is to find lines that look like headings in the provided text and format them using Markdown (## or ###).
 
