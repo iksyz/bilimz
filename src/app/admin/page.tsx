@@ -217,14 +217,50 @@ export default function AdminPage() {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
+          const targetRatio = 16 / 9;
+          const imgRatio = img.width / img.height;
+          
+          let sourceWidth = img.width;
+          let sourceHeight = img.height;
+          let sourceX = 0;
+          let sourceY = 0;
+
+          // Enforce 16:9 aspect ratio
+          if (imgRatio > targetRatio) {
+            // Image is wider than 16:9, crop sides
+            sourceWidth = img.height * targetRatio;
+            sourceX = (img.width - sourceWidth) / 2;
+          } else if (imgRatio < targetRatio) {
+            // Image is taller than 16:9, crop top/bottom
+            sourceHeight = img.width / targetRatio;
+            sourceY = (img.height - sourceHeight) / 2;
+          }
+
+          // Max dimensions for optimization (e.g., 1920x1080)
+          let targetWidth = sourceWidth;
+          let targetHeight = sourceHeight;
+          const MAX_WIDTH = 1920;
+          
+          if (targetWidth > MAX_WIDTH) {
+            targetWidth = MAX_WIDTH;
+            targetHeight = Math.round(MAX_WIDTH / targetRatio);
+          }
+
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          
           const ctx = canvas.getContext("2d");
           if (!ctx) {
             reject(new Error("2D Canvas bağlamı oluşturulamadı."));
             return;
           }
-          ctx.drawImage(img, 0, 0);
+          
+          ctx.drawImage(
+            img, 
+            sourceX, sourceY, sourceWidth, sourceHeight, 
+            0, 0, targetWidth, targetHeight
+          );
+          
           canvas.toBlob(
             (blob) => {
               if (!blob) {

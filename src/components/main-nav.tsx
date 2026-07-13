@@ -102,11 +102,13 @@ export function MainNav() {
       {/* Mobile Navigation */}
       <div className="flex flex-1 items-center justify-end md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
+          <SheetTrigger 
+            render={
+              <Button variant="ghost" size="icon" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" />
+            }
+          >
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Toggle Menu</span>
           </SheetTrigger>
           <SheetContent side="right" className="w-[85vw] max-w-md p-0 font-sans border-l border-primary/10 bg-background/98 backdrop-blur-xl">
             <SheetHeader className="px-6 py-6 text-left border-b border-border/40">

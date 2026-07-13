@@ -1,3 +1,4 @@
+import { Metadata, ResolvingMetadata } from "next";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2, BookmarkPlus, Link as LinkIcon, Mail } from "lucide-react";
 import Link from "next/link";
@@ -7,6 +8,64 @@ import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60;
 export const runtime = "edge";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  
+  let article: any = null;
+  try {
+    const { data, error } = await supabase
+      .from("science_posts")
+      .select("*")
+      .eq("slug", resolvedParams.slug)
+      .single();
+    
+    if (!error && data) {
+      article = data;
+    } else {
+      article = fallbackPosts.find(p => p.slug === resolvedParams.slug);
+    }
+  } catch (e) {
+    article = fallbackPosts.find(p => p.slug === resolvedParams.slug);
+  }
+
+  if (!article) {
+    return {
+      title: "Article Not Found | ScienceOne",
+    };
+  }
+
+  return {
+    title: `${article.title} | ScienceOne`,
+    description: article.summary,
+    openGraph: {
+      title: article.title,
+      description: article.summary,
+      url: `https://scienceone.net/article/${article.slug}`,
+      siteName: 'ScienceOne',
+      images: [
+        {
+          url: article.image_url,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+      type: 'article',
+      publishedTime: article.created_at,
+      authors: ['Emre İpekyüz'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.summary,
+      images: [article.image_url],
+    },
+  };
+}
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -102,6 +161,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.15]">
               {article.title}
             </h1>
+            <div className="flex items-center gap-3 pt-4">
+              <div className="h-12 w-12 rounded-full bg-[#E5F7ED] dark:bg-emerald-900/40 flex items-center justify-center text-[#10B981] dark:text-emerald-400 font-bold text-base shadow-sm">
+                Eİ
+              </div>
+              <div className="flex flex-col">
+                <span className="text-base font-bold text-foreground">Emre İpekyüz</span>
+                <span className="text-sm text-foreground/80 font-medium">Founder & Science Writer</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -127,6 +195,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground leading-tight">
             {article.title}
           </h1>
+          <div className="flex items-center gap-3 pt-2">
+            <div className="h-10 w-10 rounded-full bg-[#E5F7ED] dark:bg-emerald-900/40 flex items-center justify-center text-[#10B981] dark:text-emerald-400 font-bold text-sm shadow-sm">
+              Eİ
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-foreground">Emre İpekyüz</span>
+              <span className="text-xs text-muted-foreground font-medium">Founder & Science Writer</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -172,26 +249,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             }} />
           </div>
 
-          {/* Author Bio (E-E-A-T) */}
-          <div className="mt-12 pt-8 border-t border-border animate-in fade-in duration-1000 delay-500 fill-mode-both">
-            <div className="bg-muted/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 border border-border/50 hover:border-primary/30 transition-colors">
-              <div className="h-24 w-24 rounded-full bg-primary/10 shrink-0 overflow-hidden border-2 border-primary/20 flex items-center justify-center text-primary text-3xl font-bold shadow-sm">
-                Eİ
-              </div>
-              <div className="text-center md:text-left flex-1">
-                <h3 className="text-xl font-bold text-foreground mb-1">Emre İpekyüz</h3>
-                <p className="text-primary font-medium text-sm mb-3">Founder & Science Writer @ ScienceOne</p>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  An investigative writer translating complex developments in technology, space sciences, and bio-technology into accessible language. He aims to increase scientific literacy by bringing the innovations of the future to today's readers.
-                </p>
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <Link href="https://scienceone.net" className="text-xs font-semibold text-foreground/70 hover:text-primary transition-colors bg-background/50 px-3 py-1.5 rounded-full border border-border">
-                    Read More
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+
           
           {/* Mobile Action Bar (Moved to end) */}
           <div className="flex items-center gap-3 mt-12 md:hidden border-t border-border pt-8 animate-in fade-in duration-1000 delay-700 fill-mode-both">
@@ -205,7 +263,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <Mail className="h-5 w-5" />
             </Button>
             <div className="flex-1" />
-            <Button variant="default" className="rounded-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary shadow-none h-12 px-6 font-semibold transition-colors">
+            <Button variant="default" className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600 shadow-none h-12 px-6 font-semibold transition-colors">
               <BookmarkPlus className="h-5 w-5 mr-2" />
               Save
             </Button>

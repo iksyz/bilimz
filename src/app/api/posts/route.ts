@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import slugify from "slugify";
+import { revalidatePath } from "next/cache";
+import { notifyGoogleIndexing } from "@/lib/indexing";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -79,6 +81,11 @@ export async function POST(request: Request) {
       throw error;
     }
 
+    revalidatePath("/sitemap.xml");
+    
+    // Notify Google Indexing API
+    await notifyGoogleIndexing(`https://scienceone.net/article/${post.slug}`, "URL_UPDATED");
+    
     return NextResponse.json({ ok: true, post });
   } catch (error: any) {
     console.error("POST /api/posts error:", error);
@@ -155,6 +162,11 @@ export async function PATCH(request: Request) {
       throw updateError;
     }
 
+    revalidatePath("/sitemap.xml");
+
+    // Notify Google Indexing API
+    await notifyGoogleIndexing(`https://scienceone.net/article/${updatedPost.slug}`, "URL_UPDATED");
+
     return NextResponse.json({ ok: true, post: updatedPost });
   } catch (error: any) {
     console.error("PATCH /api/posts error:", error);
@@ -193,6 +205,11 @@ export async function DELETE(request: Request) {
         { status: 404 }
       );
     }
+
+    revalidatePath("/sitemap.xml");
+
+    // Notify Google Indexing API
+    await notifyGoogleIndexing(`https://scienceone.net/article/${slug}`, "URL_DELETED");
 
     return NextResponse.json({ ok: true, message: "Article deleted successfully." });
   } catch (error: any) {

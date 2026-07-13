@@ -16,6 +16,28 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ScienceOne - Global Science Discovery",
   description: "Where data, theories, and discoveries converge.",
+  openGraph: {
+    title: "ScienceOne - Global Science Discovery",
+    description: "Where data, theories, and discoveries converge.",
+    url: "https://scienceone.net",
+    siteName: "ScienceOne",
+    images: [
+      {
+        url: "https://scienceone.net/og-default.jpg", // Make sure to have a default image here
+        width: 1200,
+        height: 630,
+        alt: "ScienceOne",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ScienceOne - Global Science Discovery",
+    description: "Where data, theories, and discoveries converge.",
+    images: ["https://scienceone.net/og-default.jpg"],
+  },
   robots: {
     index: true,
     follow: true,
