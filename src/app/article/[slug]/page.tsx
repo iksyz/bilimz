@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2, BookmarkPlus, Link as LinkIcon, Mail } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60;
@@ -17,7 +17,7 @@ export async function generateMetadata(
   
   let article: any = null;
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("science_posts")
       .select("*")
       .eq("slug", resolvedParams.slug)
@@ -72,7 +72,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   let article: any = null;
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("science_posts")
       .select("*")
       .eq("slug", resolvedParams.slug)

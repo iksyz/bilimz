@@ -5,16 +5,17 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { ArticleCard } from "@/components/article-card";
 
-import { supabase } from "@/lib/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60; // Revalidate every minute
+export const runtime = "edge";
 
 export default async function Home() {
   let posts: any[] = [];
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("science_posts")
       .select("*")
       .order("created_at", { ascending: false })

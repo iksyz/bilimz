@@ -1,6 +1,6 @@
 import { ArticleCard } from "@/components/article-card";
 import { DiscoverControls } from "@/components/discover-controls";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60; // Revalidate every minute
@@ -18,7 +18,7 @@ export default async function DiscoverPage({
   let posts: any[] = [];
 
   try {
-    let query = supabase.from("science_posts").select("*").order("created_at", { ascending: false });
+    let query = supabaseAdmin.from("science_posts").select("*").order("created_at", { ascending: false });
     
     if (category && category !== "All") {
       query = query.eq("category", category);
