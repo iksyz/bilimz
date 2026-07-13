@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import slugify from "slugify";
+import { slugify } from "@/lib/slugify";
 import { revalidatePath } from "next/cache";
 import { notifyGoogleIndexing } from "@/lib/indexing";
 
@@ -42,8 +42,8 @@ export async function POST(request: Request) {
 
     // Generate clean slug
     const baseSlug = customSlug 
-      ? slugify(customSlug, { lower: true, strict: true }) 
-      : slugify(title, { lower: true, strict: true });
+      ? slugify(customSlug) 
+      : slugify(title);
     
     let slug = baseSlug;
     let counter = 1;
@@ -126,8 +126,8 @@ export async function PATCH(request: Request) {
 
     // Handle slug change
     let finalSlug = slug;
-    if (customSlug && slugify(customSlug, { lower: true, strict: true }) !== slug) {
-      const baseSlug = slugify(customSlug, { lower: true, strict: true });
+    if (customSlug && slugify(customSlug) !== slug) {
+      const baseSlug = slugify(customSlug);
       let tempSlug = baseSlug;
       let counter = 1;
 

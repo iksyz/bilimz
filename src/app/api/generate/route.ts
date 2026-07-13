@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-import slugify from "slugify";
+import { createMessage } from "@/lib/anthropic";
+import { slugify } from "@/lib/slugify";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { CLAUDE_SYSTEM_PROMPT } from "@/lib/prompt-templates";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "dummy",
-});
-
 // Mock Leonardo function for prototype.
-// In production, you would call Leonardo.ai POST /generations, wait for completion, then GET the image.
 async function generateImage(prompt: string): Promise<string> {
   console.log("Generating image with prompt:", prompt);
-  // Return a stunning science-themed placeholder for now
   return "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=2070&auto=format&fit=crop";
 }
 
@@ -29,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Select a random topic (or pass it via request body)
+    // 2. Select a random topic
     const topics = [
       "The potential of Neuralink in treating neurodegenerative diseases",
       "Dark Matter mapping and its implications for cosmology",
@@ -39,7 +33,7 @@ export async function POST(request: Request) {
     const selectedTopic = topics[Math.floor(Math.random() * topics.length)];
 
     // 3. Generate Content with Claude
-    const msg = await anthropic.messages.create({
+    const msg = await createMessage({
       model: "claude-3-7-sonnet-20250219",
       max_tokens: 2000,
       system: CLAUDE_SYSTEM_PROMPT,
@@ -51,7 +45,7 @@ export async function POST(request: Request) {
       ]
     });
 
-    const responseText = (msg.content[0] as any).text;
+    const responseText = msg.content[0]?.text || "";
     
     // Parse the JSON response
     // Claude might wrap it in ```json blocks, so we clean it first
@@ -66,7 +60,7 @@ export async function POST(request: Request) {
     const imageUrl = await generateImage(articleData.image_prompt);
     
     // 5. Create Slug
-    const slug = slugify(articleData.title, { lower: true, strict: true });
+    const slug = slugify(articleData.title);
 
     // 6. Save to Supabase
     const { data, error } = await supabaseAdmin

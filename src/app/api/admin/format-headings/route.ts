@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { createMessage } from "@/lib/anthropic";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -26,14 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, message: "Text is required." }, { status: 400 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ ok: false, message: "Anthropic API key is missing." }, { status: 500 });
-    }
-
-    const anthropic = new Anthropic({ apiKey });
-
-    const msg = await anthropic.messages.create({
+    const msg = await createMessage({
       model: "claude-sonnet-4-5",
       max_tokens: 4000,
       system: SYSTEM_PROMPT,
@@ -41,7 +34,7 @@ export async function POST(request: Request) {
       temperature: 0.1,
     });
 
-    const formattedText = (msg.content[0] as any).text;
+    const formattedText = msg.content[0]?.text;
 
     if (!formattedText) {
       return NextResponse.json({ ok: false, message: "No content returned from AI." }, { status: 500 });
