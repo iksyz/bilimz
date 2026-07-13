@@ -4,7 +4,6 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60; // Revalidate every minute
-export const runtime = "edge";
 
 export default async function DiscoverPage({
   searchParams,

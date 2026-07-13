@@ -7,7 +7,6 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { fallbackPosts } from "@/lib/mock-data";
 
 export const revalidate = 60;
-export const runtime = "edge";
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> },
