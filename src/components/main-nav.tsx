@@ -27,22 +27,22 @@ import {
 const categories = [
   {
     title: "Bio-Tech",
-    href: "/category/bio-tech",
+    href: "/discover?category=Bio-Tech",
     description: "Genetics, Neuroscience, Biotechnology, Molecular Biology.",
   },
   {
     title: "Cosmos",
-    href: "/category/cosmos",
+    href: "/discover?category=Cosmos",
     description: "Astrophysics, Space Exploration, Cosmology.",
   },
   {
     title: "Life-Science",
-    href: "/category/life-science",
+    href: "/discover?category=Life-Science",
     description: "Nutritional Biochemistry, Sports Physiology, Circadian Rhythm, Longevity.",
   },
   {
     title: "Deep-Dive",
-    href: "/category/deep-dive",
+    href: "/discover?category=Deep-Dive",
     description: "Statistical Analysis, Scientific Theories, Technological Revolutions.",
   },
 ]
