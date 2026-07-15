@@ -23,13 +23,16 @@ export function DiscoverControls() {
   const currentQuery = searchParams.get("q") || "";
 
   const [query, setQuery] = useState(currentQuery);
+  const [activeCategory, setActiveCategory] = useState(currentCategory);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setQuery(currentQuery);
-  }, [currentQuery]);
+    setActiveCategory(currentCategory);
+  }, [currentQuery, currentCategory]);
 
   const updateFilters = (newCategory: string, newQuery: string) => {
+    setActiveCategory(newCategory); // Optimistic UI update
     const params = new URLSearchParams(searchParams.toString());
     
     if (newCategory && newCategory !== "All") {
@@ -51,7 +54,7 @@ export function DiscoverControls() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    updateFilters(currentCategory, query);
+    updateFilters(activeCategory, query);
   };
 
   return (
@@ -80,7 +83,7 @@ export function DiscoverControls() {
       {/* Category Pills */}
       <div className="flex flex-wrap items-center justify-center gap-3">
         {CATEGORIES.map((category) => {
-          const isActive = currentCategory === category;
+          const isActive = activeCategory === category;
           return (
             <button
               key={category}
