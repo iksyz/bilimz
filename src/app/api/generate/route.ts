@@ -124,6 +124,12 @@ export async function POST(request: Request) {
     // 5. Create Slug
     const slug = slugify(articleData.title);
 
+    // Determine correct author
+    let autoAuthor = "Emre Ipekyuz";
+    if (articleData.category === "Cosmos") autoAuthor = "Siir Kaya";
+    else if (articleData.category === "Bio-Tech") autoAuthor = "Wei Chen";
+    else if (articleData.category === "Deep-Dive") autoAuthor = "Lukas Weber";
+
     // 6. Save to Supabase
     const { data, error } = await supabaseAdmin
       .from("science_posts")
@@ -135,7 +141,8 @@ export async function POST(request: Request) {
           category: articleData.category,
           content: articleData.content,
           image_prompt: articleData.image_prompt,
-          image_url: imageUrl
+          image_url: imageUrl,
+          author: autoAuthor
         }
       ])
       .select()

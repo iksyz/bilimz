@@ -198,8 +198,14 @@ export default function AdminPage() {
 
     localStorage.setItem(DRAFTS_KEY, JSON.stringify(currentDrafts));
     setDrafts(currentDrafts);
-    setActiveDraftId(draftId);
-    showMsg(`Taslak "${newDraft.label}" başarıyla yerel olarak kaydedildi.`, "success");
+    
+    // Taslağı kaydettikten sonra editörü temizle ve taslaklar sekmesine geç
+    setForm(INITIAL_FORM);
+    setEditingSlug(null);
+    setActiveDraftId(null);
+    setActiveTab("drafts");
+    
+    showMsg(`Taslak başarıyla kaydedildi. Editör temizlendi.`, "success");
   }
 
   function loadDraft(draft: Draft) {
@@ -684,17 +690,24 @@ export default function AdminPage() {
         addLog("Makale başarıyla üretildi. Taslaklara kaydediliyor...");
         await new Promise((resolve) => setTimeout(resolve, 500));
         
+        // Determine author based on category
+        let autoAuthor = "Emre Ipekyuz";
+        const postCat = data.post.category || "Bio-Tech";
+        if (postCat === "Cosmos") autoAuthor = "Siir Kaya";
+        else if (postCat === "Bio-Tech") autoAuthor = "Wei Chen";
+        else if (postCat === "Deep-Dive") autoAuthor = "Lukas Weber";
+
         // Formu yapay zekadan gelen verilerle doldur
         const newFormState = {
           title: data.post.title || "",
           summary: data.post.summary || "",
           content: data.post.content || "",
-          category: data.post.category || "Bio-Tech",
+          category: postCat,
           image_url: "",
           image_prompt: data.post.image_prompt || "",
           tags: "",
           customSlug: data.post.slug || "",
-          author: "Emre Ipekyuz",
+          author: autoAuthor,
           inline_images: (data.post.inline_image_prompts || []).map((p: string) => ({ prompt: p, url: "", isGenerating: false })),
         };
         
@@ -1165,11 +1178,11 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold tracking-wider uppercase text-primary">Yazar (Kategoriye Özel)</label>
+                      <label className="text-xs font-bold tracking-wider uppercase text-primary">Yazar Seçimi</label>
                       <select
                         value={form.author}
-                        disabled
-                        className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm text-muted-foreground focus:outline-none opacity-80 cursor-not-allowed"
+                        onChange={(e) => setForm((prev) => ({ ...prev, author: e.target.value }))}
+                        className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-primary/50"
                       >
                         <option value="Emre Ipekyuz" className="bg-[#011410]">Emre Ipekyuz</option>
                         <option value="Siir Kaya" className="bg-[#011410]">Siir Kaya</option>
@@ -1563,9 +1576,10 @@ export default function AdminPage() {
                       <Button
                         variant="outline"
                         onClick={() => loadDraft(draft)}
-                        className="border-primary/20 hover:bg-primary/10 text-primary-foreground text-xs h-8"
+                        className="border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs h-8 flex items-center gap-1.5"
                       >
-                        Editöre Yükle
+                        <Edit3 className="w-3.5 h-3.5" />
+                        Düzenle
                       </Button>
                       <Button
                         variant="outline"
