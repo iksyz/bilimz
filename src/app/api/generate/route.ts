@@ -31,30 +31,93 @@ export async function POST(request: Request) {
     ];
     const selectedTopic = topics[Math.floor(Math.random() * topics.length)];
 
-    // 3. Generate Content with Claude
+    // 3. Search Web with Tavily
+    let searchContext = "";
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    if (tavilyKey) {
+      try {
+        const searchRes = await fetch("https://api.tavily.com/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: tavilyKey,
+            query: `latest scientific research news: ${selectedTopic}`,
+            search_depth: "basic",
+            include_answer: false,
+            max_results: 3
+          })
+        });
+        
+        if (searchRes.ok) {
+          const searchData = await searchRes.json();
+          if (searchData.results && searchData.results.length > 0) {
+            searchContext = searchData.results
+              .map((r: any) => `Source: ${r.url}\nContext: ${r.content}`)
+              .join("\n\n");
+          }
+        }
+      } catch (err) {
+        console.error("Tavily search error:", err);
+      }
+    }
+
+    // 4. Generate Content with Claude
+    const promptContent = searchContext
+      ? `Topic: ${selectedTopic}\n\nRecent scientific context from the web:\n${searchContext}\n\nGenerate a new scientific discovery piece based on this context. Apply the ScienceOne.net editorial style.`
+      : `Generate a new scientific discovery piece about: ${selectedTopic}. Apply the ScienceOne.net editorial style.`;
+
     const msg = await createMessage({
-      model: "claude-3-7-sonnet-20250219",
-      max_tokens: 2000,
+      model: "claude-sonnet-5",
+      max_tokens: 8192,
       system: CLAUDE_SYSTEM_PROMPT,
       messages: [
         {
           role: "user",
-          content: `Generate a new scientific discovery piece about: ${selectedTopic}. Apply the ScienceOne.net editorial style.`
+          content: promptContent
         }
       ]
     });
 
-    const responseText = msg.content[0]?.text || "";
-    
+    const textBlock = msg.content.find((b: any) => b.type === "text");
+    const responseText = textBlock ? textBlock.text : "";
+
     // Parse the JSON response
     // Claude might wrap it in ```json blocks, so we clean it first
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error("No JSON match in response:", responseText);
       throw new Error("Failed to parse JSON from Claude response.");
     }
     
-    const articleData = JSON.parse(jsonMatch[0]);
+    let articleData;
+    try {
+      articleData = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error("JSON Parse Error. Raw Response:", responseText);
+      throw new Error("Failed to parse JSON from Claude response. See server logs for details.");
+    }
     
+    // Check if this is a draft generation request (from Admin Panel)
+    const url = new URL(request.url);
+    const isDraft = url.searchParams.get("draft") === "true";
+
+    if (isDraft) {
+      // Just return the raw AI output for the Admin to preview and edit
+      return NextResponse.json({ 
+        success: true, 
+        post: {
+          title: articleData.title,
+          summary: articleData.summary,
+          category: articleData.category,
+          content: articleData.content,
+          image_prompt: articleData.image_prompt,
+          image_url: "",
+          slug: articleData.slug || slugify(articleData.title),
+          inline_image_prompts: articleData.inline_image_prompts || []
+        } 
+      });
+    }
+
     // 4. Generate Image via Leonardo.ai (Mocked)
     const imageUrl = await generateImage(articleData.image_prompt);
     

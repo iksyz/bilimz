@@ -209,7 +209,10 @@ export async function DELETE(request: Request) {
       );
     }
 
+    // Force Next.js to purge all cached versions of the homepage
     revalidatePath("/", "layout");
+    revalidatePath("/", "page");
+    revalidatePath("/");
     revalidatePath("/sitemap.xml");
 
     // Notify Google Indexing API

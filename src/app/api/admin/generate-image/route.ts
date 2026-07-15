@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const KINO_XL_MODEL_ID = "aa77f04e-3eec-4034-9c07-d0f619684628";
     
     // Prompt'u daha kaliteli ve sinematik hale getirmek için ekler yapıyoruz
-    const enhancedPrompt = `${prompt}, cinematic lighting, hyper-detailed, photorealistic, high quality, masterpiece, 8k resolution, highly textured, science fiction aesthetic`;
+    const enhancedPrompt = `${prompt}, modern documentary photography, highly detailed, raw photorealism, shot on 85mm lens, 8k resolution, realistic textures, cinematic lighting`;
 
     const createRes = await fetch(`${LEO_API_URL}/generations`, {
       method: "POST",
@@ -33,6 +33,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         prompt: enhancedPrompt,
+        negative_prompt: "illustration, painting, cartoon, 3d render, animation, digital art, drawing, anime, artificial, CGI, low quality",
         modelId: KINO_XL_MODEL_ID,
         width: 1024,
         height: 576, // 16:9

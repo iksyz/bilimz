@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
-import { supabase } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/server';
 
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Force dynamic, no cache
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://scienceone.net';
@@ -25,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let articleRoutes: MetadataRoute.Sitemap = [];
   
   try {
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from('science_posts')
       .select('slug, updated_at, created_at')
       .order('created_at', { ascending: false });

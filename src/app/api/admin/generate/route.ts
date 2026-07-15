@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const host = (await headers()).get("host") || "localhost:3000";
     const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
-    const generateUrl = `${protocol}://${host}/api/generate`;
+    const generateUrl = `${protocol}://${host}/api/generate?draft=true`;
 
     const res = await fetch(generateUrl, {
       method: "POST",

@@ -39,6 +39,12 @@ type Draft = {
   label: string;
 };
 
+type Idea = {
+  title: string;
+  reasoning: string;
+  category: string;
+};
+
 type FormState = {
   title: string;
   summary: string;
@@ -49,6 +55,7 @@ type FormState = {
   tags: string;
   customSlug: string;
   author: string;
+  inline_images: { prompt: string; url: string; isGenerating: boolean }[];
 };
 
 const INITIAL_FORM: FormState = {
@@ -61,6 +68,7 @@ const INITIAL_FORM: FormState = {
   tags: "",
   customSlug: "",
   author: "Emre Ipekyuz",
+  inline_images: [],
 };
 
 export default function AdminPage() {
@@ -80,6 +88,8 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false);
   const [inlineUploading, setInlineUploading] = useState(false);
   const [formatting, setFormatting] = useState(false);
+  const [rewriting, setRewriting] = useState(false);
+  const [promptingImages, setPromptingImages] = useState(false);
   const [isLeoGenerating, setIsLeoGenerating] = useState(false);
   
   // Yapay Zeka Üretim Durumları
@@ -93,6 +103,10 @@ export default function AdminPage() {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
 
+  // Günlük Öneriler
+  const [dailyIdeas, setDailyIdeas] = useState<Idea[]>([]);
+  const [loadingIdeas, setLoadingIdeas] = useState(false);
+
   const contentRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const inlineFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -103,6 +117,7 @@ export default function AdminPage() {
   useEffect(() => {
     void loadPosts();
     loadDrafts();
+    void fetchDailyIdeas();
   }, []);
 
   async function loadPosts() {
@@ -133,6 +148,30 @@ export default function AdminPage() {
     } catch (err) {
       console.error("Taslaklar tarayıcı hafızasından yüklenemedi:", err);
     }
+  }
+
+  async function fetchDailyIdeas() {
+    setLoadingIdeas(true);
+    try {
+      const res = await fetch("/api/admin/daily-ideas");
+      const json = await res.json();
+      if (res.ok && json.ok && json.data) {
+        setDailyIdeas(json.data);
+      } else {
+        showMsg("Öneriler alınamadı.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("Öneri hatası.", "error");
+    } finally {
+      setLoadingIdeas(false);
+    }
+  }
+
+  function useIdea(idea: Idea) {
+    setForm(prev => ({...prev, title: idea.title, category: idea.category || prev.category}));
+    setActiveTab("editor");
+    showMsg(`"${idea.category || "Fikir"}" kategorisinde fikir seçildi. Taslağınızı oluşturabilirsiniz.`, "success");
   }
 
   function saveLocalDraft() {
@@ -342,49 +381,164 @@ export default function AdminPage() {
 
   function insertImageAtCursor(url: string, altText: string) {
     const md = `\n![${altText || "Görsel"}](${url})\n`;
-    const textarea = contentRef.current;
-    if (!textarea) {
-      setForm((prev) => ({ ...prev, content: `${prev.content}${md}` }));
-      return;
-    }
+    
+    setForm((prev) => {
+      const textarea = contentRef.current;
+      const currentText = prev.content || "";
+      
+      if (!textarea) {
+        return { ...prev, content: `${currentText}${md}` };
+      }
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const currentText = form.content;
-    const nextText = currentText.substring(0, start) + md + currentText.substring(end);
-    setForm((prev) => ({ ...prev, content: nextText }));
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const nextText = currentText.substring(0, start) + md + currentText.substring(end);
 
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + md.length, start + md.length);
-    }, 50);
+      setTimeout(() => {
+        if (contentRef.current) {
+          contentRef.current.focus();
+          contentRef.current.setSelectionRange(start + md.length, start + md.length);
+        }
+      }, 50);
+
+      return { ...prev, content: nextText };
+    });
   }
 
   // --- Leonardo AI ---
-  async function generateLeoImage(type: 'cover' | 'inline') {
-    if (!form.image_prompt.trim()) {
+  async function generateLeoImage(type: 'cover' | 'inline', index?: number) {
+    const inlineImages = form.inline_images || [];
+    const prompt = type === 'cover' ? form.image_prompt : (index !== undefined ? inlineImages[index].prompt : '');
+    
+    if (!prompt?.trim()) {
       showMsg("Lütfen önce görsel üretim istemini (prompt) yazın.", "info");
       return;
     }
 
-    setIsLeoGenerating(true);
+    if (type === 'cover') setIsLeoGenerating(true);
+    else if (index !== undefined) {
+      setForm(prev => {
+        const next = [...(prev.inline_images || [])];
+        if(next[index]) next[index].isGenerating = true;
+        return { ...prev, inline_images: next };
+      });
+    }
+
+    let currentPrompt = prompt;
+    const isRegenerate = type === 'cover' ? !!form.image_url : !!form.inline_images![index!].url;
+
+    if (isRegenerate) {
+      showMsg("Sanat yönetmeni daha iyi bir alternatif görsel konsepti tasarlıyor...", "info");
+      try {
+        const rwRes = await fetch("/api/admin/rewrite-image-prompt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: currentPrompt }),
+        });
+        const rwData = await rwRes.json();
+        if (rwRes.ok && rwData.ok && rwData.prompt) {
+          currentPrompt = rwData.prompt;
+          // UI'da kullanıcının da yeni prompt'u görebilmesi için state'i güncelleyelim
+          if (type === 'cover') {
+            setForm((prev) => ({ ...prev, image_prompt: currentPrompt }));
+          } else if (index !== undefined) {
+            setForm((prev) => {
+              const next = [...(prev.inline_images || [])];
+              if (next[index]) next[index].prompt = currentPrompt;
+              return { ...prev, inline_images: next };
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Rewrite prompt failed", e);
+      }
+    }
+
     showMsg(`Leonardo AI görsel üretiyor (${type === 'cover' ? 'Kapak' : 'Yazı İçi'}). Lütfen bekleyin...`, "info");
 
     try {
       const res = await fetch("/api/admin/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: form.image_prompt }),
+        body: JSON.stringify({ prompt: currentPrompt }),
       });
 
       const data = await res.json();
       if (res.ok && data.ok && data.url) {
-        if (type === 'cover') {
-          setForm((prev) => ({ ...prev, image_url: data.url }));
-          showMsg("Kapak görseli başarıyla üretildi ve eklendi.", "success");
-        } else {
-          insertImageAtCursor(data.url, form.image_prompt.slice(0, 30));
-          showMsg("Görsel üretildi ve yazı içine eklendi.", "success");
+        showMsg("Görsel WebP formatına dönüştürülüp veritabanına kaydediliyor...", "info");
+        
+        try {
+          const proxyRes = await fetch(`/api/admin/proxy-image?url=${encodeURIComponent(data.url)}`);
+          if (!proxyRes.ok) throw new Error("Görsel indirilemedi");
+          
+          const blob = await proxyRes.blob();
+          const fileName = `leo-${Date.now()}.jpg`;
+          const file = new File([blob], fileName, { type: blob.type });
+          
+          const webpFile = await convertToWebP(file);
+          
+          const formData = new FormData();
+          formData.append("file", webpFile);
+          
+          const uploadRes = await fetch("/api/admin/blog-upload", {
+            method: "POST",
+            body: formData,
+          });
+          
+          const uploadData = await uploadRes.json();
+          
+          if (uploadRes.ok && uploadData.ok && uploadData.url) {
+            const finalUrl = uploadData.url;
+            if (type === 'cover') {
+              setForm((prev) => ({ ...prev, image_url: finalUrl }));
+              showMsg("Kapak görseli başarıyla WebP olarak kaydedildi.", "success");
+            } else if (index !== undefined) {
+              setForm((prev) => {
+                const nextInline = [...(prev.inline_images || [])];
+                if(nextInline[index]) nextInline[index].url = finalUrl;
+                
+                const currentInline = prev.inline_images?.[index];
+                const altText = currentInline?.prompt?.slice(0, 30) || "Görsel";
+                const mdImage = `![${altText}](${finalUrl})`;
+                
+                let currentText = prev.content || "";
+                const paragraphs = currentText.split('\n\n');
+                
+                let insertIndex = Math.min(2, paragraphs.length - 1);
+                
+                if (index === 0) {
+                   const h2Idx = paragraphs.findIndex((p, i) => i > 1 && p.startsWith('##'));
+                   if (h2Idx !== -1) insertIndex = h2Idx - 1;
+                } else if (index === 1) {
+                   const h2Idx = paragraphs.findIndex((p, i) => i > 4 && p.startsWith('##'));
+                   if (h2Idx !== -1) insertIndex = h2Idx - 1;
+                   else insertIndex = Math.floor(paragraphs.length * 0.6);
+                } else {
+                   insertIndex = Math.floor(paragraphs.length * 0.8);
+                }
+                
+                if (paragraphs.length <= 2) {
+                   currentText = currentText + "\n\n" + mdImage + "\n\n";
+                } else {
+                   const newParagraphs = [
+                      ...paragraphs.slice(0, insertIndex + 1),
+                      mdImage,
+                      ...paragraphs.slice(insertIndex + 1)
+                   ];
+                   currentText = newParagraphs.join('\n\n');
+                }
+                
+                return { ...prev, inline_images: nextInline, content: currentText };
+              });
+              
+              showMsg("Yazı içi görsel WebP olarak kaydedildi ve metne akıllıca eklendi!", "success");
+            }
+          } else {
+            showMsg(uploadData.message || "WebP yükleme işlemi başarısız.", "error");
+          }
+        } catch (e) {
+          console.error("WebP dönüştürme hatası:", e);
+          showMsg("Görsel üretildi ancak WebP olarak kaydedilemedi.", "error");
         }
       } else {
         showMsg(data.message || "Görsel üretimi başarısız oldu.", "error");
@@ -393,7 +547,14 @@ export default function AdminPage() {
       console.error(err);
       showMsg("Leonardo AI görsel üretilirken hata oluştu.", "error");
     } finally {
-      setIsLeoGenerating(false);
+      if (type === 'cover') setIsLeoGenerating(false);
+      else if (index !== undefined) {
+        setForm(prev => {
+          const next = [...(prev.inline_images || [])];
+          if(next[index]) next[index].isGenerating = false;
+          return { ...prev, inline_images: next };
+        });
+      }
     }
   }
 
@@ -429,6 +590,72 @@ export default function AdminPage() {
     }
   }
 
+  async function aiRewriteContent() {
+    if (!form.title.trim()) {
+      showMsg("Lütfen önce bir makale başlığı yazın.", "info");
+      return;
+    }
+
+    setRewriting(true);
+    showMsg("AI içeriği yeniden yazıyor...", "info");
+
+    try {
+      const res = await fetch("/api/admin/rewrite-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: form.title, currentContent: form.content }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok && data.rewrittenText) {
+        setForm((prev) => ({ ...prev, content: data.rewrittenText }));
+        showMsg("İçerik başarıyla yeniden yazıldı!", "success");
+      } else {
+        showMsg(data.message || "İçerik yeniden yazılamadı.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("AI içerik yeniden yazma işlemi başarısız.", "error");
+    } finally {
+      setRewriting(false);
+    }
+  }
+
+  async function aiGeneratePrompts() {
+    if (!form.content.trim()) {
+      showMsg("Lütfen önce makale içeriğini (Markdown) yazın.", "info");
+      return;
+    }
+
+    setPromptingImages(true);
+    showMsg("AI içeriği okuyup görsel istemlerini hazırlıyor...", "info");
+
+    try {
+      const res = await fetch("/api/admin/generate-image-prompts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: form.title, content: form.content }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok && data.data) {
+        setForm((prev) => ({
+          ...prev,
+          image_prompt: data.data.image_prompt || prev.image_prompt,
+          inline_images: (data.data.inline_image_prompts || []).map((p: string) => ({ prompt: p, url: "", isGenerating: false }))
+        }));
+        showMsg("Görsel istemleri başarıyla hazırlandı! Artık üretebilirsin.", "success");
+      } else {
+        showMsg(data.message || "İstemler hazırlanamadı.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("AI işleminde bir hata oluştu.", "error");
+    } finally {
+      setPromptingImages(false);
+    }
+  }
+
   async function aiGeneratePost() {
     setGenerating(true);
     setGenerationLogs([]);
@@ -446,7 +673,7 @@ export default function AdminPage() {
       addLog("Gelişmekte olan güncel bir bilimsel konu seçiliyor...");
       
       await new Promise((resolve) => setTimeout(resolve, 800));
-      addLog("Claude-3.7-Sonnet makale yazım motoru tetikleniyor...");
+      addLog("Claude-Sonnet-5 makale yazım motoru tetikleniyor...");
 
       const res = await fetch("/api/admin/generate", {
         method: "POST",
@@ -454,14 +681,46 @@ export default function AdminPage() {
       const data = await res.json();
 
       if (res.ok && data.ok && data.post) {
-        addLog("Sinematik bilimsel kapak görseli üretiliyor...");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        addLog("Makale başarıyla üretildi. Taslaklara kaydediliyor...");
+        await new Promise((resolve) => setTimeout(resolve, 500));
         
-        addLog(`Makale başarıyla üretildi: "${data.post.title}"`);
-        addLog("Veritabanı senkronize ediliyor...");
+        // Formu yapay zekadan gelen verilerle doldur
+        const newFormState = {
+          title: data.post.title || "",
+          summary: data.post.summary || "",
+          content: data.post.content || "",
+          category: data.post.category || "Bio-Tech",
+          image_url: "",
+          image_prompt: data.post.image_prompt || "",
+          tags: "",
+          customSlug: data.post.slug || "",
+          author: "Emre Ipekyuz",
+          inline_images: (data.post.inline_image_prompts || []).map((p: string) => ({ prompt: p, url: "", isGenerating: false })),
+        };
         
-        await loadPosts();
-        showMsg(`AI Makalesi yayınlandı: ${data.post.title}`, "success");
+        setForm(newFormState);
+        setEditingSlug(null);
+        
+        // Otomatik taslak oluştur ve ID'yi kaydet
+        const draftId = `draft-${Date.now()}`;
+        setActiveDraftId(draftId);
+        
+        const currentDrafts = [...drafts];
+        currentDrafts.unshift({
+          id: draftId,
+          form: newFormState,
+          savedAt: new Date().toISOString(),
+          label: data.post.title || "AI Taslağı",
+        });
+        
+        localStorage.setItem(DRAFTS_KEY, JSON.stringify(currentDrafts));
+        setDrafts(currentDrafts);
+        
+        addLog("Taslak başarıyla yüklendi.");
+        showMsg(`AI Makalesi üretildi ve taslak olarak kaydedildi. Görseli ekleyip yayınlayabilirsiniz.`, "success");
+        
+        // Editör sekmesine geç
+        setActiveTab("editor");
       } else {
         addLog(`Hata: ${data.message || "AI üretim hattı başarısız."}`);
         showMsg(data.message || "AI makale üretimi başarısız oldu.", "error");
@@ -537,6 +796,7 @@ export default function AdminPage() {
       tags: "",
       customSlug: post.slug,
       author: post.author || "Emre Ipekyuz",
+      inline_images: [],
     });
     setActiveDraftId(post.slug);
     setActiveTab("editor");
@@ -798,28 +1058,54 @@ export default function AdminPage() {
               </CardContent>
             </Card>
 
-            {/* Hızlı İpuçları */}
-            <Card className="bg-[#02221b] border-primary/20 text-white shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold">Hızlı İpuçları</CardTitle>
+            {/* Günlük Öneriler */}
+            <Card className="bg-[#02221b] border-primary/20 text-white shadow-xl flex flex-col">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-primary/10">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400" /> Günün Discover Önerileri
+                </CardTitle>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={fetchDailyIdeas} 
+                  disabled={loadingIdeas}
+                  className="text-[#a7f3d0]/60 hover:text-white hover:bg-primary/10 h-8 px-2"
+                >
+                  {loadingIdeas ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                </Button>
               </CardHeader>
-              <CardContent className="text-sm text-[#a7f3d0]/80 space-y-4">
-                <div className="flex gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold">1</div>
-                  <p>Tamamen otomatik makaleler üretmek için <strong>Otonom AI Üretici</strong>'yi kullanın. Görsel de otomatik tasarlanacaktır.</p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold">2</div>
-                  <p>Veya kendi makalenizi manuel yazmak için <strong>Editör</strong>'ü kullanın. Görseller yükleyip metne ekleyebilirsiniz.</p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold">3</div>
-                  <p>Editördeki <strong>AI Başlık Düzenleyici</strong>'ye tıklayarak başlıkları otomatik olarak estetik markdown formatına getirin.</p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold">4</div>
-                  <p>Yayınlamadan önce sağ taraftaki <strong>Canlı Kart Önizlemesi</strong>'nden makale kartını kontrol edin.</p>
-                </div>
+              <CardContent className="pt-4 flex-1 overflow-y-auto max-h-72">
+                {loadingIdeas ? (
+                  <div className="flex flex-col items-center justify-center h-full text-[#a7f3d0]/60 space-y-2">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    <p className="text-sm">Yayın Yönetmeni taze fikirler arıyor...</p>
+                  </div>
+                ) : dailyIdeas.length > 0 ? (
+                  <div className="space-y-4">
+                    {dailyIdeas.map((idea, idx) => (
+                      <div 
+                        key={idx} 
+                        className="group bg-[#011410] border border-primary/10 hover:border-primary/40 rounded-xl p-3 cursor-pointer transition-all hover:bg-primary/5 flex gap-3 items-start"
+                        onClick={() => useIdea(idea)}
+                      >
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold text-xs mt-0.5">{idx + 1}</div>
+                        <div className="space-y-1.5">
+                          {idea.category && (
+                            <span className="bg-primary/20 text-primary text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold inline-block mb-0.5">
+                              {idea.category}
+                            </span>
+                          )}
+                          <p className="font-bold text-sm text-white group-hover:text-primary transition-colors leading-snug">{idea.title}</p>
+                          <p className="text-[11px] text-[#a7f3d0]/60 leading-relaxed">{idea.reasoning}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-[#a7f3d0]/60 text-sm">
+                    Öneri bulunamadı. Lütfen yenileyin.
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -943,12 +1229,23 @@ export default function AdminPage() {
                         {/* AI Düzenle */}
                         <button
                           type="button"
-                          disabled={formatting}
+                          disabled={formatting || rewriting}
                           onClick={aiFormatHeadings}
                           className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-xs text-white font-semibold flex items-center gap-1 transition-all"
                         >
                           {formatting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                           AI Başlık Düzenleyici
+                        </button>
+
+                        {/* AI Yeniden Yaz */}
+                        <button
+                          type="button"
+                          disabled={formatting || rewriting}
+                          onClick={aiRewriteContent}
+                          className="bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-lg px-3 py-1.5 text-xs text-primary font-bold flex items-center gap-1 transition-all"
+                        >
+                          {rewriting ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                          İçeriği Yeniden Yaz
                         </button>
                       </div>
                     </div>
@@ -1003,37 +1300,97 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold tracking-wider uppercase text-primary">Görsel Üretim İstemi (Image Prompt) <span className="text-[10px] text-muted-foreground font-normal lowercase">(AI referansı için)</span></label>
-                      <div className="flex gap-2">
+                  {/* Görsel Üretim Alanı */}
+                  <div className="space-y-4 pt-4 border-t border-primary/10">
+                    <div className="flex justify-between items-center bg-[#011a14] p-3 rounded-xl border border-primary/20">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-primary">Sanat Yönetmeni (AI)</span>
+                        <span className="text-[10px] text-muted-foreground mt-0.5">Yazdığın metni okuyup en uygun görsel komutlarını hazırlasın.</span>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={promptingImages || !form.content.trim()}
+                        onClick={aiGeneratePrompts}
+                        className="bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-lg px-3 py-1.5 text-xs text-indigo-400 font-bold flex items-center gap-1.5 transition-all disabled:opacity-50"
+                      >
+                        {promptingImages ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                        İstemleri Hazırla
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold tracking-wider uppercase text-primary">Kapak Görseli İstemi (Image Prompt)</label>
                         <button
                           type="button"
                           disabled={isLeoGenerating || !form.image_prompt.trim()}
                           onClick={() => generateLeoImage('cover')}
-                          className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-[10px] text-[#a7f3d0] font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
+                          className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-[10px] text-amber-400 font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
                         >
-                          {isLeoGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-amber-400" />}
-                          Kapak İçin Üret
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isLeoGenerating || !form.image_prompt.trim()}
-                          onClick={() => generateLeoImage('inline')}
-                          className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-[10px] text-[#a7f3d0] font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
-                        >
-                          {isLeoGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-indigo-400" />}
-                          Yazı İçi Üret
+                          {isLeoGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                          {form.image_url ? "Kapağı Yeniden Üret" : "16:9 Kapak Üret"}
                         </button>
                       </div>
+                      <input
+                        type="text"
+                        value={form.image_prompt}
+                        onChange={(e) => setForm((prev) => ({ ...prev, image_prompt: e.target.value }))}
+                        placeholder="Örn: Işıldayan sinir yollarının minimalist çizimi, yeşil ve beyaz tonlar..."
+                        className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm text-white placeholder-muted-foreground focus:outline-none focus:border-primary/50"
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={form.image_prompt}
-                      onChange={(e) => setForm((prev) => ({ ...prev, image_prompt: e.target.value }))}
-                      placeholder="Örn: Işıldayan sinir yollarının minimalist çizimi, yeşil ve beyaz tonlar..."
-                      className="w-full bg-[#011410] border border-primary/20 rounded-lg p-3 text-sm text-white placeholder-muted-foreground focus:outline-none focus:border-primary/50"
-                    />
+
+                    {(form.inline_images || []).length > 0 && (
+                      <div className="space-y-3 pt-2">
+                        <label className="text-xs font-bold tracking-wider uppercase text-indigo-400">Yazı İçi Görseller (İsteğe Bağlı)</label>
+                        {(form.inline_images || []).map((img, idx) => (
+                          <div key={idx} className="bg-[#011a14] border border-primary/10 rounded-xl p-3 flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <textarea
+                                rows={2}
+                                value={img.prompt}
+                                onChange={(e) => {
+                                  const next = [...(form.inline_images || [])];
+                                  if(next[idx]) next[idx].prompt = e.target.value;
+                                  setForm(prev => ({ ...prev, inline_images: next }));
+                                }}
+                                className="w-full bg-transparent border-0 p-0 text-xs text-white placeholder-muted-foreground focus:outline-none focus:ring-0 resize-none leading-relaxed"
+                              />
+                            </div>
+                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                              {img.url ? (
+                                <img src={img.url} alt="Inline preview" className="h-16 w-auto rounded border border-primary/20 object-cover" />
+                              ) : (
+                                <div className="h-16 w-28 bg-[#011410] border border-primary/10 rounded flex items-center justify-center text-[10px] text-muted-foreground">Önizleme Yok</div>
+                              )}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  disabled={img.isGenerating || !img.prompt.trim()}
+                                  onClick={() => generateLeoImage('inline', idx)}
+                                  className="bg-[#011410] hover:bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5 text-[10px] text-indigo-400 font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
+                                >
+                                  {img.isGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                  {img.url ? "Yeniden Üret" : "16:9 Üret"}
+                                </button>
+                                {img.url && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      insertImageAtCursor(img.url, img.prompt.slice(0, 30));
+                                      showMsg("Görsel yazı içine imlecin olduğu yere eklendi.", "success");
+                                    }}
+                                    className="bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-lg px-3 py-1.5 text-[10px] text-primary font-bold flex items-center gap-1 transition-all"
+                                  >
+                                    <Plus className="w-3 h-3" /> Metne Ekle
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Form Butonları */}

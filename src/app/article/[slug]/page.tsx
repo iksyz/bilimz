@@ -257,6 +257,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         {/* Prose Content */}
         <div className="flex-1 max-w-3xl">
+          {article.summary && (
+            <p className="text-xl md:text-[22px] font-medium leading-[1.6] text-foreground/80 mb-10 pb-8 border-b border-primary/10 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-400">
+              {article.summary}
+            </p>
+          )}
           <div 
             className="prose prose-emerald prose-lg max-w-none text-foreground/90
             prose-headings:font-bold prose-headings:tracking-tight

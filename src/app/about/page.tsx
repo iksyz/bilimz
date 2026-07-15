@@ -58,6 +58,7 @@ export default function AboutPage() {
                     <h3 className="font-bold text-foreground mb-1">Office Location</h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       Talaytepe, Laleş Blv.,<br />
+                      AY CENTER,<br />
                       21070 Kayapınar/Diyarbakır,<br />
                       Turkey
                     </p>
