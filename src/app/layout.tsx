@@ -5,7 +5,7 @@ import { MainNav } from "@/components/main-nav";
 import { Footer } from "@/components/footer";
 
 const sourceSans = Source_Sans_3({
-  variable: "--font-sans",
+  variable: "--font-source-sans",
   subsets: ["latin"],
   display: "swap",
 });
