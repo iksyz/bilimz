@@ -28,13 +28,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const { data } = await supabaseAdmin
       .from('science_posts')
-      .select('slug, updated_at, created_at')
+      .select('slug, created_at')
       .order('created_at', { ascending: false });
 
     if (data) {
       articleRoutes = data.map((post) => ({
         url: `${baseUrl}/article/${post.slug}`,
-        lastModified: post.updated_at || post.created_at || new Date().toISOString(),
+        lastModified: post.created_at ? new Date(post.created_at).toISOString() : new Date().toISOString(),
         changeFrequency: 'weekly' as const,
         priority: 0.7,
       }));
