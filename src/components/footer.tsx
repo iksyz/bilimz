@@ -17,7 +17,7 @@ export function Footer() {
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="flex items-center gap-2 group w-fit">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/20 text-white transition-all duration-300">
-                <Atom className="w-5 h-5 animate-[spin_10s_linear_infinite]" />
+                <Atom className="w-5 h-5 animate-[spin_10s_linear_infinite] will-change-transform" />
               </div>
               <span className="font-bold text-xl tracking-tight text-white">Science<span className="font-normal opacity-80">One</span></span>
             </Link>

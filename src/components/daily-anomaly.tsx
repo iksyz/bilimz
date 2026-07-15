@@ -8,9 +8,9 @@ export function DailyAnomaly() {
           <Zap className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
             The Daily Anomaly
-          </h3>
+          </p>
           <p className="text-foreground/80 md:text-lg font-medium leading-snug">
             If you could fold a standard piece of paper 42 times, it would reach the Moon.
           </p>

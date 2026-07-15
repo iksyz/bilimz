@@ -9,6 +9,9 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ post, index }: ArticleCardProps) {
+  // First 3 cards are above the fold — load eagerly with high priority
+  const isAboveFold = index < 3;
+
   return (
     <Link href={`/article/${post.slug}`} className="block group">
       <Card 
@@ -20,6 +23,7 @@ export function ArticleCard({ post, index }: ArticleCardProps) {
             src={post.image_url || "/og-default.jpg"} 
             alt={post.title} 
             fill
+            priority={isAboveFold}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105" 
           />

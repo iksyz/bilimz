@@ -1,4 +1,5 @@
 import { Metadata, ResolvingMetadata } from "next";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2, BookmarkPlus, Link as LinkIcon, Mail } from "lucide-react";
 import Link from "next/link";
@@ -139,10 +140,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       
       {/* Cinematic Hero Section (Desktop) */}
       <div className="hidden md:block relative w-full h-[70vh] bg-muted overflow-hidden">
-        <img 
+        <Image 
           src={article.image_url} 
           alt={article.title}
-          className="absolute inset-0 object-cover w-full h-full animate-in zoom-in-105 duration-1000 fill-mode-both"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover animate-in zoom-in-105 duration-1000 fill-mode-both"
         />
         {/* Gradient Overlay - Tuned for desktop to leave the top image vibrant */}
         <div className="absolute inset-0 bg-gradient-to-t from-background from-30% via-background/80 via-60% to-transparent pointer-events-none" />
@@ -191,10 +195,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       {/* Standard App-Like Header (Mobile) */}
       <div className="md:hidden w-full bg-background">
         <div className="relative w-full aspect-[4/3] bg-muted overflow-hidden">
-          <img 
+          <Image 
             src={article.image_url} 
             alt={article.title}
-            className="absolute inset-0 object-cover w-full h-full animate-in zoom-in-105 duration-1000 fill-mode-both"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover animate-in zoom-in-105 duration-1000 fill-mode-both"
           />
         </div>
         <div className="px-4 pt-6 pb-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-300">

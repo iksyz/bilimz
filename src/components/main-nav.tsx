@@ -2,18 +2,20 @@
 
 import * as React from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { Atom, Menu } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+
+// Lazy-load heavy UI components to reduce initial JS bundle
+const Sheet = dynamic(() => import("@/components/ui/sheet").then(m => ({ default: m.Sheet })), { ssr: false })
+const SheetContent = dynamic(() => import("@/components/ui/sheet").then(m => ({ default: m.SheetContent })), { ssr: false })
+const SheetDescription = dynamic(() => import("@/components/ui/sheet").then(m => ({ default: m.SheetDescription })), { ssr: false })
+const SheetHeader = dynamic(() => import("@/components/ui/sheet").then(m => ({ default: m.SheetHeader })), { ssr: false })
+const SheetTitle = dynamic(() => import("@/components/ui/sheet").then(m => ({ default: m.SheetTitle })), { ssr: false })
+const SheetTrigger = dynamic(() => import("@/components/ui/sheet").then(m => ({ default: m.SheetTrigger })), { ssr: false })
+
 import {
   NavigationMenu,
   NavigationMenuContent,
