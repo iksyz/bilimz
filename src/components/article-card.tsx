@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronRight } from "lucide-react";
@@ -15,10 +16,12 @@ export function ArticleCard({ post, index }: ArticleCardProps) {
         style={{ animationDelay: `${(index + 1) * 150}ms` }}
       >
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
-          <img 
-            src={post.image_url} 
+          <Image 
+            src={post.image_url || "/og-default.jpg"} 
             alt={post.title} 
-            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" 
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105" 
           />
           <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold tracking-wide text-primary shadow-sm border border-primary/10">
             {post.category}

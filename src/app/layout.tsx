@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { MainNav } from "@/components/main-nav";
 import { Footer } from "@/components/footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -58,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`light ${geistSans.variable} ${geistMono.variable}`} style={{ colorScheme: 'light' }} suppressHydrationWarning>
+    <html lang="en" className={`light ${sourceSans.variable}`} style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20">
         
         {/* Minimal Navbar */}

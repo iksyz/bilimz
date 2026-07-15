@@ -83,7 +83,7 @@ export function MainNav() {
           <NavigationMenuItem>
             <NavigationMenuLink 
               className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
-              render={<Link href="/discover" />}
+              render={<Link href="/discover" prefetch={false} />}
             >
               Discover
             </NavigationMenuLink>
@@ -136,7 +136,7 @@ export function MainNav() {
               </div>
               <div className="flex flex-col gap-2 pt-6 border-t border-border/40">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-foreground/50 mb-2 pl-2">Menu</h4>
-                <Link onClick={() => setOpen(false)} href="/discover" className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
+                <Link onClick={() => setOpen(false)} href="/discover" prefetch={false} className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
                   Discover
                 </Link>
                 <Link onClick={() => setOpen(false)} href="/about" className="flex items-center px-4 py-3.5 rounded-xl text-foreground/80 hover:bg-muted/60 active:scale-[0.98] transition-all font-semibold">
@@ -158,7 +158,7 @@ const ListItem = React.forwardRef<
   return (
     <li>
       <NavigationMenuLink
-        render={<Link href={href || "#"} ref={ref as any} />}
+        render={<Link href={href || "#"} prefetch={false} ref={ref as any} />}
         className={cn(
           "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900",
           className

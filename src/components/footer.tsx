@@ -42,22 +42,22 @@ export function Footer() {
             <h4 className="text-white font-bold tracking-wider text-sm uppercase">Explore</h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/discover?category=Bio-Tech" className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
+                <Link href="/discover?category=Bio-Tech" prefetch={false} className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
                   Bio-Tech
                 </Link>
               </li>
               <li>
-                <Link href="/discover?category=Cosmos" className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
+                <Link href="/discover?category=Cosmos" prefetch={false} className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
                   Cosmos
                 </Link>
               </li>
               <li>
-                <Link href="/discover?category=Life-Science" className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
+                <Link href="/discover?category=Life-Science" prefetch={false} className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
                   Life-Science
                 </Link>
               </li>
               <li>
-                <Link href="/discover?category=Deep-Dive" className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
+                <Link href="/discover?category=Deep-Dive" prefetch={false} className="text-white/80 hover:text-white font-medium transition-colors inline-flex items-center gap-2 group">
                   Deep-Dive
                 </Link>
               </li>
