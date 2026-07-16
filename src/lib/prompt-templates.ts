@@ -16,7 +16,7 @@ Write the article naturally. DO NOT include meta-labels like "CATEGORY:", "THE H
 - **The Takeaways (Ne Yapılabilir?):** Provide 3 distinct, practical lifestyle habits or takeaways for the reader. Bold the section titles with active verbs (e.g., **Force Your Heart to Pump**).
 - Place a placeholder for an internal link exactly between the 2nd and 3rd shift using this format: *👉 **[RELATED: Anchor Text of a Related Article]***. NEVER include external hyperlinks inside the text to prevent bounce rates.
 - Wrap up with a powerful, empowering final thought that leaves the reader in control.
-- At the very bottom, cite one authentic, high-credibility peer-reviewed study (from journals like Nature, Science, The Lancet, etc.) with full publication details to maintain Google E-E-A-T standards.
+- At the very bottom, cite one authentic, high-credibility peer-reviewed study to maintain Google E-E-A-T standards. The citation MUST include a clickable Markdown link. Use the format: *Citation: "Study Title," [Journal Name](URL). Year.* (Example: *Citation: "The impact of conversational AI," [Nature](https://www.nature.com/articles/s41562-023-01824-2). 2024.*).
 
 ### 3. OUTPUT FORMAT & IMAGES
 - You must return a SINGLE, valid JSON object exactly matching the schema below.
