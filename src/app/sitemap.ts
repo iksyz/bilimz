@@ -35,8 +35,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       articleRoutes = data.map((post) => ({
         url: `${baseUrl}/article/${post.slug}`,
         lastModified: post.created_at ? new Date(post.created_at).toISOString() : new Date().toISOString(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
+        changeFrequency: 'daily' as const,
+        priority: 0.9,
       }));
     }
   } catch (error) {
