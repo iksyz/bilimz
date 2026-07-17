@@ -297,6 +297,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 .replace(/!\[([^\]]*)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<figure class="my-8"><img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl object-cover border border-primary/10" /><figcaption class="text-center text-sm text-muted-foreground mt-3 px-4 italic">$1</figcaption></figure>')
                 .replace(/\[([^\]]+)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-4">$1</a>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^\*]+)\*/g, '<em>$1</em>')
                 .replace(/### (.*?)(?:\n|$)/g, '<h3 class="text-2xl font-bold mt-10 mb-4 tracking-tight flex items-center gap-3 text-foreground"><span class="w-1.5 h-6 bg-emerald-500 rounded-full inline-block"></span>$1</h3>')
                 .replace(/## (.*?)(?:\n|$)/g, '<h2 class="text-3xl md:text-4xl font-extrabold mt-14 mb-6 tracking-tight text-emerald-600 dark:text-emerald-400 border-b border-emerald-500/20 pb-4">$1</h2>')
                 .replace(/> \*\*(.*?)\*\*/g, '<blockquote><strong>$1</strong></blockquote>')
