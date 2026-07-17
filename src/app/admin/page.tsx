@@ -96,6 +96,12 @@ export default function AdminPage() {
   const [generating, setGenerating] = useState(false);
   const [generationLogs, setGenerationLogs] = useState<string[]>([]);
   
+  // Discover Audit Durumları
+  const [auditing, setAuditing] = useState(false);
+  const [auditResult, setAuditResult] = useState<string | null>(null);
+  const [fixingAudit, setFixingAudit] = useState(false);
+  const [autoLinking, setAutoLinking] = useState(false);
+  
   // Bildirimler
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
 
@@ -624,6 +630,126 @@ export default function AdminPage() {
       showMsg("AI içerik yeniden yazma işlemi başarısız.", "error");
     } finally {
       setRewriting(false);
+    }
+  }
+
+  async function aiAuditContent() {
+    if (!form.title.trim() || !form.content.trim()) {
+      showMsg("Lütfen denetim için başlık ve makale içeriğini doldurun.", "info");
+      return;
+    }
+
+    setAuditing(true);
+    setAuditResult(null);
+    showMsg("AI Baş Editör makaleyi inceliyor... (E-E-A-T ve Discover Testi)", "info");
+
+    try {
+      const res = await fetch("/api/admin/audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          title: form.title, 
+          summary: form.summary,
+          content: form.content,
+          imageUrl: form.image_url,
+          imagePrompt: form.image_prompt 
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok && data.auditText) {
+        setAuditResult(data.auditText);
+        showMsg("Denetim raporu hazır!", "success");
+      } else {
+        showMsg(data.message || "Denetim işlemi başarısız.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("AI denetim işlemi başarısız.", "error");
+    } finally {
+      setAuditing(false);
+    }
+  }
+
+  async function aiAutoLinkContent() {
+    if (!form.content.trim()) {
+      showMsg("Lütfen önce makale içeriğini (Markdown) yazın.", "info");
+      return;
+    }
+
+    setAutoLinking(true);
+    showMsg("AI bilimsel terimleri bulup Wikipedia/NASA linkleri ekliyor...", "info");
+
+    try {
+      const res = await fetch("/api/admin/auto-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: form.content }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok && data.linkedText) {
+        setForm((prev) => ({ ...prev, content: data.linkedText }));
+        showMsg("Akıllı linkler başarıyla eklendi!", "success");
+      } else {
+        showMsg(data.message || "Linkleme başarısız.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("Linkleme işlemi başarısız.", "error");
+    } finally {
+      setAutoLinking(false);
+    }
+  }
+
+  async function aiFixAuditErrors() {
+    if (!form.title || !form.content || !auditResult) return;
+
+    setFixingAudit(true);
+    showMsg("AI Baş Editörün uyarılarına göre tüm alanlar (Başlık, Özet, Slug vb.) yeniden düzenleniyor...", "info");
+
+    try {
+      const res = await fetch("/api/admin/audit-fix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title,
+          summary: form.summary,
+          customSlug: form.customSlug,
+          image_prompt: form.image_prompt,
+          inline_images: form.inline_images ? form.inline_images.map(img => img.prompt) : [],
+          content: form.content,
+          auditReport: auditResult
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setForm((prev) => ({
+          ...prev,
+          title: data.title || prev.title,
+          summary: data.summary || prev.summary,
+          customSlug: data.customSlug || prev.customSlug,
+          image_prompt: data.image_prompt || prev.image_prompt,
+          inline_images: data.inline_images && data.inline_images.length > 0 
+            ? data.inline_images.map((p: string, idx: number) => ({
+                prompt: p, 
+                url: prev.inline_images?.[idx]?.url || "",
+                isGenerating: false
+              })) 
+            : prev.inline_images,
+          content: data.content || prev.content
+        }));
+        setAuditResult(data.fixSummary || "### ✨ Neler Düzeltildi?\n- AI tüm düzeltmeleri başarıyla uyguladı."); 
+        showMsg("Harika! Tüm eleştiriler dikkate alındı ve formdaki tüm alanlar güncellendi.", "success");
+      } else {
+        showMsg(data.message || "Düzeltme işlemi başarısız.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg("AI otomatik düzeltme işlemi başarısız.", "error");
+    } finally {
+      setFixingAudit(false);
     }
   }
 
@@ -1253,12 +1379,34 @@ export default function AdminPage() {
                         {/* AI Yeniden Yaz */}
                         <button
                           type="button"
-                          disabled={formatting || rewriting}
+                          disabled={formatting || rewriting || auditing || autoLinking}
                           onClick={aiRewriteContent}
                           className="bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-lg px-3 py-1.5 text-xs text-primary font-bold flex items-center gap-1 transition-all"
                         >
                           {rewriting ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
                           İçeriği Yeniden Yaz
+                        </button>
+
+                        {/* Akıllı Linkleyici */}
+                        <button
+                          type="button"
+                          disabled={formatting || rewriting || auditing || autoLinking}
+                          onClick={aiAutoLinkContent}
+                          className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg px-3 py-1.5 text-xs text-blue-400 font-bold flex items-center gap-1 transition-all"
+                        >
+                          {autoLinking ? <Loader2 className="w-3 h-3 animate-spin" /> : <span className="w-3.5 h-3.5 text-center leading-none">🔗</span>}
+                          Akıllı Linkleyici
+                        </button>
+
+                        {/* AI Audit */}
+                        <button
+                          type="button"
+                          disabled={formatting || rewriting || auditing || autoLinking}
+                          onClick={aiAuditContent}
+                          className="bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg px-3 py-1.5 text-xs text-purple-400 font-bold flex items-center gap-1 transition-all"
+                        >
+                          {auditing ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                          AI Discover Denetimi
                         </button>
                       </div>
                     </div>
@@ -1281,6 +1429,46 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Audit Result Display */}
+                  {auditResult && (
+                    <div className="bg-[#1f0f29] border border-purple-500/30 rounded-xl p-5 my-4 relative">
+                      <button 
+                        onClick={() => setAuditResult(null)}
+                        className="absolute top-3 right-3 text-purple-400 hover:text-white bg-purple-500/20 p-1.5 rounded-md transition-colors"
+                      >
+                        Kapat
+                      </button>
+                      <h3 className="text-lg font-bold text-purple-400 flex items-center gap-2 mb-4">
+                        <CheckCircle className="w-5 h-5" /> 
+                        AI Baş Editör Denetim Raporu
+                      </h3>
+                      <div className="prose prose-invert prose-purple max-w-none text-sm leading-relaxed"
+                        dangerouslySetInnerHTML={{ 
+                          __html: auditResult
+                            .replace(/\n/g, '<br/>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+                            .replace(/### (.*?)(<br\/>|$)/g, '<h4 class="text-md font-bold text-purple-300 mt-4 mb-2">$1</h4>')
+                            .replace(/## (.*?)(<br\/>|$)/g, '<h3 class="text-lg font-bold text-purple-400 mt-6 mb-2 border-b border-purple-500/20 pb-1">$1</h3>')
+                        }} 
+                      />
+                      
+                      <div className="mt-6 pt-4 border-t border-purple-500/20 flex justify-end">
+                        <button
+                          type="button"
+                          disabled={fixingAudit}
+                          onClick={aiFixAuditErrors}
+                          className="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition-all flex items-center gap-2"
+                        >
+                          {fixingAudit ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> Sihir Gerçekleşiyor...</>
+                          ) : (
+                            <><Sparkles className="w-4 h-4" /> Tüm Hataları Otomatik Düzelt</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Kapak Görseli */}
                   <div className="grid gap-4 md:grid-cols-2">

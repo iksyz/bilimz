@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       : `Generate a new scientific discovery piece about: ${selectedTopic}. Apply the ScienceOne.net editorial style.`;
 
     const msg = await createMessage({
-      model: "claude-sonnet-5",
+      model: "claude-sonnet-4-5",
       max_tokens: 8192,
       system: CLAUDE_SYSTEM_PROMPT,
       messages: [

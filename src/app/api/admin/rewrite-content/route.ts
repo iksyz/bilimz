@@ -12,10 +12,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, message: "Başlık gerekli." }, { status: 400 });
     }
 
-    const prompt = `Rewrite the following scientific article content. Improve the narrative arc to clearly explain: 1. What is the event? 2. What is the issue/analogy? 3. What is the solution? 4. What are the takeaways? Keep it highly engaging, simple, and jargon-free like a premium editorial. Maintain markdown formatting. Do not include meta labels. Here is the current content to improve:\n\nTitle: ${title}\n\nContent:\n${currentContent || 'Draft a new engaging scientific piece for this title.'}`;
+    const prompt = `Rewrite the following scientific article content. Improve the narrative arc to clearly explain: 1. What is the event? 2. What is the issue/analogy? 3. What is the solution? 4. What are the takeaways? Keep it highly engaging, simple, and jargon-free like a premium editorial. Maintain markdown formatting. Do not include meta labels. 
+
+IMPORTANT RULE (NO HALLUCINATIONS): DO NOT invent or hallucinate specific numbers, dates, radius (km), mass, or distances unless they are explicitly provided in the original text! If a specific statistic is missing, use general qualitative terms (e.g., "incredibly dense", "massive", "recently") instead of making up unverified numbers. Unverified numbers ruin E-E-A-T credibility.
+
+Here is the current content to improve:\n\nTitle: ${title}\n\nContent:\n${currentContent || 'Draft a new engaging scientific piece for this title.'}`;
 
     const msg = await createMessage({
-      model: "claude-sonnet-5",
+      model: "claude-sonnet-4-5",
       max_tokens: 8192,
       system: "You are an expert digital publisher. Return ONLY the rewritten markdown content. No conversational intro or outro.",
       messages: [

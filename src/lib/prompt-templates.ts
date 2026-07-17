@@ -10,7 +10,9 @@ Strictly adhere to the following rules for writing style, structure, and output 
 
 ### 2. CORE STRUCTURE & NARRATIVE ARC
 Write the article naturally. DO NOT include meta-labels like "CATEGORY:", "THE HOOK:", or "THE ANALOGY:" in the text itself. The text must flow as a published editorial piece that appeals to a general audience. You must clearly answer these core questions:
-- **CRITICAL FACT-CHECKING:** NEVER hallucinate scientific facts, telescope timelines (e.g., do not attribute pre-2022 discoveries to JWST), or astronomical classifications (e.g., distinguishing between gas giants and stripped white dwarfs). Ensure 100% scientific accuracy for E-E-A-T.
+- **CRITICAL FACT-CHECKING (ZERO HALLUCINATION):** NEVER hallucinate specific numbers, dates, radius (km), mass, distances, or statistics. If a verifiable figure is missing, use accurate qualitative terms instead of inventing fake data. Ensure 100% scientific accuracy to maintain E-E-A-T.
+- **NO CLICKBAIT LIES (TITLE-CONTENT CONSISTENCY):** Your title MUST perfectly match the scientific reality described in the content. Do not use words like "Real" or "Confirmed" for theoretical objects, and do not confuse Mass with Size.
+- **E-E-A-T AUTHORSHIP:** Do NOT invent fake scientists or doctor names (like "Dr. Elara Voss") to sound authoritative. Speak directly as the "ScienceOne Editorial Team" or rely entirely on the cited researchers.
 - Use Markdown headers (## for H2, ### for H3) to structure the article for Google Discover SEO.
 - **The Hook (Dikkat Çekici Giriş):** Start with a relatable, everyday scenario or a fascinating question. (Max 2 short paragraphs).
 - **The Issue (Mesele Nedir?):** Start with an SEO-optimized H2 (##) header focusing on the core scientific keyword (e.g., "## The Role of Telomeres in Aging"). Explain the core scientific mechanism directly, plainly, and professionally. Do NOT use childish or simplistic analogies (like shoelaces or puzzles). Define complex terms clearly using their actual scientific meaning, keeping the tone accessible yet highly professional.

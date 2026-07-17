@@ -277,6 +277,23 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           >
             <div dangerouslySetInnerHTML={{ 
               __html: article.content
+                .replace(/(?:^[ \t]*\|[^\n]*\|\n?){3,}/gm, (match: string) => {
+                  const lines = match.trim().split('\n');
+                  if (lines.length < 3 || !lines[1].includes('---')) return match;
+                  const parseRow = (r: string) => r.split('|').map(c => c.trim()).filter((_, i, arr) => i > 0 && i < arr.length - 1);
+                  const headers = parseRow(lines[0]);
+                  const rows = lines.slice(2).map(parseRow);
+                  let html = '<div class="overflow-x-auto my-10 border border-primary/20 rounded-2xl shadow-sm"><table class="w-full text-left text-sm md:text-base"><thead class="bg-primary/5 text-foreground border-b border-primary/20"><tr>';
+                  headers.forEach((h: string) => html += `<th class="px-6 py-4 font-bold tracking-tight">${h}</th>`);
+                  html += '</tr></thead><tbody class="divide-y divide-primary/10">';
+                  rows.forEach((row: string[]) => {
+                    html += '<tr class="hover:bg-primary/5 transition-colors">';
+                    row.forEach((cell: string) => html += `<td class="px-6 py-4 text-foreground/90">${cell}</td>`);
+                    html += '</tr>';
+                  });
+                  html += '</tbody></table></div>';
+                  return html;
+                })
                 .replace(/!\[([^\]]*)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<figure class="my-8"><img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl object-cover border border-primary/10" /><figcaption class="text-center text-sm text-muted-foreground mt-3 px-4 italic">$1</figcaption></figure>')
                 .replace(/\[([^\]]+)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-4">$1</a>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')

@@ -1,0 +1,44 @@
+<applied_fixes>
+- Başlığa "2011" tarihi eklendi
+- "Dead Star's Corpse" redundancy düzeltildi
+- Pulsarın aktif olduğu netleştirildi
+- Spesifik yarıçap rakamları kaldırıldı
+- JWST referansı tamamen silindi
+- Görsel istemi tek odağa indirgendi
+- Okunmaz caption text detayı kaldırıldı
+- Görsel istemi/alt metin karışıklığı giderildi
+- Kanıtsız "benchmark case" iddiası kaldırıldı
+- Kanıtsız "theoretical papers" iddiası yumuşatıldı
+- Editöryel doğrulama notu eklendi
+- Özet ve slug tazelik için güncellendi
+- Başlık heading'i "corpse" tekrarından arındırıldı
+- "Dead star" ifadesi bağlama göre düzeltildi
+</applied_fixes>
+
+<title>In 2011, Astronomers Found a Jupiter-Mass "Diamond World" Orbiting a Hyperactive Pulsar</title>
+
+<summary>In 2011, astronomers detected PSR J1719-1438b: a Jupiter-mass world that may be a crystallized carbon core orbiting a rapidly spinning pulsar every 2.2 hours.</summary>
+
+<customSlug>diamond-world-pulsar-2011-discovery</customSlug>
+
+<image_prompt>Hyper-realistic 16:9 space illustration in the style of a professional astronomical artist's impression: a small, dense, elongated planet with a faceted, crystalline surface glinting like a cut diamond, orbiting extremely close to a compact, brilliant pulsar that emits twin beams of bluish-white radio-wave energy from its poles. The pulsar is depicted as an intensely bright, small sphere with dynamic light-trail effects suggesting rapid rotation, surrounded by a faint energetic glow. The diamond-like planet's surface catches sharp prismatic light reflections against the black backdrop of space, with a subtle starfield and distant nebula clouds providing depth. Single, clear focal point on the planet-pulsar pair, no telescopes, no astronauts, no control rooms, no embedded text or captions, ultra-detailed digital space art rendered with photorealistic lighting, dramatic contrast, strong sense of scale and cosmic isolation, evoking genuine scientific wonder.</image_prompt>
+
+<inline_images>
+</inline_images>
+
+<content>
+For decades, astronomers believed they understood how stars die and what becomes of their companions. But in 2011, a discovery buried in the data from the Parkes Radio Telescope in Australia forced scientists to rewrite a small but stunning chapter of that story. The object in question is called PSR J1719-1438b. It orbits so close to the collapsed remnant of a star that, by most conventional models, it shouldn't still exist at all.
+
+More than a decade after its discovery, this strange world remains one of the most compelling examples of just how bizarre stellar remnants can be. It illustrates physical extremes that continue to interest researchers studying degenerate matter, though it should be noted that no single follow-up survey has established it as a formal "benchmark" — its ongoing relevance comes simply from how unusual it is.
+
+## A Stellar Remnant with the Mass of Jupiter
+
+PSR J1719-1438b orbits a millisecond pulsar — the ultra-dense, rapidly spinning remnant of a star that exploded as a supernova. Although pulsars are often described poetically as "dead stars," this label can be misleading: a pulsar is, in fact, an extraordinarily active object, spinning hundreds of times per second and sweeping the galaxy with precise, lighthouse-like beams of radio energy. It is "dead" only in the sense that nuclear fusion has stopped; in every other sense, it is one of the most energetic objects in the universe.
+
+This particular pulsar spins roughly once every 5.7 milliseconds, and its planetary companion completes a full orbit in just 2.2 hours. The system sits approximately 4,000 light-years from Earth, in the constellation Serpens.
+
+The planet itself is not a gas giant in the traditional sense. Researchers led by astrophysicist Matthew Bailes proposed in 2011 that this object is the stripped-down core of what was once a normal companion star. When the primary star in this binary system exploded and collapsed into a pulsar, its ferocious radiation and gravity tore away the outer layers of its companion. What remained behind, scientists argue, is an ultra-compressed remnant made almost entirely of carbon and oxygen.
+
+This remnant carries roughly the same mass as Jupiter — though it's worth noting that this figure is technically a **minimum mass estimate**. Because astronomers cannot directly observe the system's orbital inclination angle, the true mass could be somewhat higher. Jupiter's mass represents the lower bound of what the data allows, not a confirmed upper limit.
+
+Its density, however, is nowhere near that of a normal gas giant. Degenerate matter behaves in strange ways under extreme pressure: greater mass in this kind of object tends to mean a smaller radius, not a larger one. Despite holding roughly Jupiter's mass, PSR J1719-1438b's actual physical size is thought to be dramatically smaller than Jupiter's. Published density estimates suggest a body far denser than any ordinary planet, likely placing it closer in scale to an ice giant like Neptune than to a true gas giant. Precise radius figures are not tightly constrained in the original research, and reputable sources vary in their
