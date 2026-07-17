@@ -48,6 +48,8 @@ export const metadata: Metadata = {
   },
 };
 
+import Script from "next/script";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -55,6 +57,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`light ${sourceSans.variable}`} style={{ colorScheme: 'light' }} suppressHydrationWarning>
+      <head>
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-H7SRDLN3ZF`}
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-H7SRDLN3ZF');
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20">
         
         {/* Minimal Navbar */}
