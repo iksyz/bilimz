@@ -277,7 +277,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           >
             <div dangerouslySetInnerHTML={{ 
               __html: article.content
-                .replace(/!\[([^\]]*)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl my-8 object-cover border border-primary/10" />')
+                .replace(/!\[([^\]]*)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<figure class="my-8"><img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl object-cover border border-primary/10" /><figcaption class="text-center text-sm text-muted-foreground mt-3 px-4 italic">$1</figcaption></figure>')
                 .replace(/\[([^\]]+)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-4">$1</a>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/### (.*?)(?:\n|$)/g, '<h3 class="text-2xl font-bold mt-10 mb-4 tracking-tight flex items-center gap-3 text-foreground"><span class="w-1.5 h-6 bg-emerald-500 rounded-full inline-block"></span>$1</h3>')

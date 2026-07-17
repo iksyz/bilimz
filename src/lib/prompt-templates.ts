@@ -10,19 +10,21 @@ Strictly adhere to the following rules for writing style, structure, and output 
 
 ### 2. CORE STRUCTURE & NARRATIVE ARC
 Write the article naturally. DO NOT include meta-labels like "CATEGORY:", "THE HOOK:", or "THE ANALOGY:" in the text itself. The text must flow as a published editorial piece that appeals to a general audience. You must clearly answer these core questions:
+- **CRITICAL FACT-CHECKING:** NEVER hallucinate scientific facts, telescope timelines (e.g., do not attribute pre-2022 discoveries to JWST), or astronomical classifications (e.g., distinguishing between gas giants and stripped white dwarfs). Ensure 100% scientific accuracy for E-E-A-T.
 - Use Markdown headers (## for H2, ### for H3) to structure the article for Google Discover SEO.
 - **The Hook (Dikkat Çekici Giriş):** Start with a relatable, everyday scenario or a fascinating question. (Max 2 short paragraphs).
 - **The Issue (Mesele Nedir?):** Start with an SEO-optimized H2 (##) header focusing on the core scientific keyword (e.g., "## The Role of Telomeres in Aging"). Explain the core scientific mechanism directly, plainly, and professionally. Do NOT use childish or simplistic analogies (like shoelaces or puzzles). Define complex terms clearly using their actual scientific meaning, keeping the tone accessible yet highly professional.
 - **The Solution (Çözüm Nedir?):** Use an H2 (##) header for the solution section.
 - **The Takeaways (Ne Yapılabilir?):** Provide 3 practical takeaways. Use H3 (###) headers for each takeaway title with active verbs (e.g., "### Force Your Heart to Pump"). Do not just bold them, you must use ###.
 - Place a placeholder for a related article exactly between the 2nd and 3rd shift. The format MUST be plain text followed by a source link, like this: RELATED: Title of a Related Article [Source Name](URL). Do not put brackets around the main text, and do not make the main text a link. Only the source name should be a clickable markdown link. Do not use emojis.
-- Wrap up with a powerful, empowering final thought that leaves the reader in control.
-- At the very bottom, cite one authentic, high-credibility peer-reviewed study to maintain Google E-E-A-T standards. Use this exact format: Source: ["Study Title", Journal Name, Year](URL). The word "Source:" must be plain text, and the actual citation must be a clickable markdown link. (Example: Source: ["The impact of conversational AI," Nature, 2024](https://www.nature.com/articles/s41562-023-01824-2)).
+- Wrap up with a powerful, empowering final thought that leaves the reader in control, immediately followed by an engaging Call to Action (CTA) question to encourage reader comments and interaction.
+- At the very bottom, cite one authentic, high-credibility peer-reviewed study to maintain Google E-E-A-T standards. Use this exact format: Source: Study Title, Year [Journal Name](URL). The study title and year must be plain text (black), and ONLY the journal name should be a clickable markdown link (green). (Example: Source: The impact of conversational AI, 2024 [Nature](https://www.nature.com/articles/s41562-023-01824-2)).
 
 ### 3. OUTPUT FORMAT & IMAGES
 - You must return a SINGLE, valid JSON object exactly matching the schema below.
 - Slugs MUST be extremely short, SEO-friendly, and use dashes (e.g., "brain-chip-implant").
 - Image prompts (cover and inline) MUST specifically ask for photorealistic, hyper-realistic, cinematic 16:9 images suitable for a premium digital magazine.
+- IMPORTANT: DO NOT include any image markdown syntax (like '![]()') inside the actual 'content' string. The text must remain clean. Images will be handled separately by the admin.
 
 JSON OUTPUT FORMAT:
 {
