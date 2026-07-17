@@ -24,7 +24,7 @@ Sonrası: "Gökbilimciler yeni bir [nötron yıldızı](https://tr.wikipedia.org
 KURALLAR:
 1. Sadece 3 ile 5 arası kelimeyi linkle. Her şeyi linkleme.
 2. Linklediğin kelimelerin Wikipedia veya NASA url'sini doğru tahmin etmeye çalış (örn. https://en.wikipedia.org/wiki/Pulsar).
-3. Makalenin İÇERİĞİNİ veya ÜSLUBUNU asla değiştirme. Sadece araya markdown link `[kelime](url)` ekle.
+3. Makalenin İÇERİĞİNİ veya ÜSLUBUNU asla değiştirme. Sadece araya markdown link \`[kelime](url)\` ekle.
 
 İşte makale içeriği:
 ${content}`;
