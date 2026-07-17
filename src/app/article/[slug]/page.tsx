@@ -258,9 +258,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {/* Prose Content */}
         <div className="flex-1 max-w-3xl">
           {article.summary && (
-            <p className="text-xl md:text-[22px] font-medium leading-[1.6] text-foreground/80 mb-10 pb-8 border-b border-primary/10 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-400">
-              {article.summary}
-            </p>
+            <div className="relative mb-16 mt-10 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-400">
+              <span className="absolute -top-16 -left-6 text-[160px] leading-none font-serif font-bold text-emerald-500/15 dark:text-emerald-500/20 select-none pointer-events-none">
+                &ldquo;
+              </span>
+              <p className="text-2xl md:text-[28px] font-medium leading-relaxed text-foreground/90 relative z-10 pl-8 border-l-4 border-emerald-500/30 dark:border-emerald-500/40">
+                {article.summary}
+              </p>
+            </div>
           )}
           <div 
             className="prose prose-emerald prose-lg max-w-none text-foreground/90
@@ -272,11 +277,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           >
             <div dangerouslySetInnerHTML={{ 
               __html: article.content
-                .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl my-8 object-cover border border-primary/10" />')
-                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-4">$1</a>')
+                .replace(/!\[([^\]]*)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<img src="$2" alt="$1" class="w-full rounded-2xl shadow-xl my-8 object-cover border border-primary/10" />')
+                .replace(/\[([^\]]+)\]\(((?:\([^)]*\)|[^)])*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-4">$1</a>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/### (.*?)(?:\n|$)/g, '<h3>$1</h3>')
-                .replace(/## (.*?)(?:\n|$)/g, '<h2>$1</h2>')
+                .replace(/### (.*?)(?:\n|$)/g, '<h3 class="text-2xl font-bold mt-10 mb-4 tracking-tight flex items-center gap-3 text-foreground"><span class="w-1.5 h-6 bg-emerald-500 rounded-full inline-block"></span>$1</h3>')
+                .replace(/## (.*?)(?:\n|$)/g, '<h2 class="text-3xl md:text-4xl font-extrabold mt-14 mb-6 tracking-tight text-emerald-600 dark:text-emerald-400 border-b border-emerald-500/20 pb-4">$1</h2>')
                 .replace(/> \*\*(.*?)\*\*/g, '<blockquote><strong>$1</strong></blockquote>')
                 .replace(/\n\n/g, '<br/><br/>')
             }} />

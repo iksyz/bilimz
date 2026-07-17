@@ -10,13 +10,14 @@ Strictly adhere to the following rules for writing style, structure, and output 
 
 ### 2. CORE STRUCTURE & NARRATIVE ARC
 Write the article naturally. DO NOT include meta-labels like "CATEGORY:", "THE HOOK:", or "THE ANALOGY:" in the text itself. The text must flow as a published editorial piece that appeals to a general audience. You must clearly answer these core questions:
-- **The Hook (Olay Nedir?):** Start directly with a relatable, real-world pain point or story. What is the event or breakthrough happening right now?
-- **The Issue (Mesele Nedir?):** Explain the core problem or scientific mechanism clearly. Use a simple, kitchen-table analogy (e.g., comparing DNA to shoelaces, quantum computing to a million-piece puzzle).
-- **The Solution (Çözüm Nedir?):** How is science or technology solving this issue? What does this mean for the future?
-- **The Takeaways (Ne Yapılabilir?):** Provide 3 distinct, practical lifestyle habits or takeaways for the reader. Bold the section titles with active verbs (e.g., **Force Your Heart to Pump**).
-- Place a placeholder for an internal link exactly between the 2nd and 3rd shift using this format: *👉 **[RELATED: Anchor Text of a Related Article]***. NEVER include external hyperlinks inside the text to prevent bounce rates.
+- Use Markdown headers (## for H2, ### for H3) to structure the article for Google Discover SEO.
+- **The Hook (Dikkat Çekici Giriş):** Start with a relatable, everyday scenario or a fascinating question. (Max 2 short paragraphs).
+- **The Issue (Mesele Nedir?):** Start with an SEO-optimized H2 (##) header focusing on the core scientific keyword (e.g., "## The Role of Telomeres in Aging"). Explain the core scientific mechanism directly, plainly, and professionally. Do NOT use childish or simplistic analogies (like shoelaces or puzzles). Define complex terms clearly using their actual scientific meaning, keeping the tone accessible yet highly professional.
+- **The Solution (Çözüm Nedir?):** Use an H2 (##) header for the solution section.
+- **The Takeaways (Ne Yapılabilir?):** Provide 3 practical takeaways. Use H3 (###) headers for each takeaway title with active verbs (e.g., "### Force Your Heart to Pump"). Do not just bold them, you must use ###.
+- Place a placeholder for a related article exactly between the 2nd and 3rd shift. The format MUST be plain text followed by a source link, like this: RELATED: Title of a Related Article [Source Name](URL). Do not put brackets around the main text, and do not make the main text a link. Only the source name should be a clickable markdown link. Do not use emojis.
 - Wrap up with a powerful, empowering final thought that leaves the reader in control.
-- At the very bottom, cite one authentic, high-credibility peer-reviewed study to maintain Google E-E-A-T standards. The citation MUST include a clickable Markdown link. Use the format: *Citation: "Study Title," [Journal Name](URL). Year.* (Example: *Citation: "The impact of conversational AI," [Nature](https://www.nature.com/articles/s41562-023-01824-2). 2024.*).
+- At the very bottom, cite one authentic, high-credibility peer-reviewed study to maintain Google E-E-A-T standards. Use this exact format: Source: ["Study Title", Journal Name, Year](URL). The word "Source:" must be plain text, and the actual citation must be a clickable markdown link. (Example: Source: ["The impact of conversational AI," Nature, 2024](https://www.nature.com/articles/s41562-023-01824-2)).
 
 ### 3. OUTPUT FORMAT & IMAGES
 - You must return a SINGLE, valid JSON object exactly matching the schema below.
