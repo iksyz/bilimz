@@ -3,6 +3,7 @@ import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { MainNav } from "@/components/main-nav";
 import { Footer } from "@/components/footer";
+import { Analytics } from "@vercel/analytics/next";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
@@ -90,6 +91,7 @@ export default function RootLayout({
         </main>
 
         <Footer />
+        <Analytics />
 
       </body>
     </html>
